@@ -1,0 +1,4 @@
+dist1	1.0	0.1
+dist2	10.0	1.0
+prob	0.9	0.1	
+threshold	2.0
