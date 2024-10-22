@@ -132,13 +132,13 @@ class SimulatedDatabase:
 
                 loss = criterion(y_pred, y_true)
 
-                if self.alg == 'fedprox':
+                if self.alg == 'FedProx':
                     proximal_term = 0
                     for w, w_global in zip(model.parameters(), global_model.parameters()):
                         proximal_term += self.mu / 2 * torch.norm(w - w_global, 2)
                     loss += proximal_term
 
-                elif self.alg == 'fedchem':
+                elif self.alg == 'FedChem':
                     if self.warmup:
                         with torch.no_grad():
                             if dataset.related_title == 'DrugBank' or dataset.related_title == 'BIOSNAP' or dataset.related_title == 'CoCrystal':
