@@ -247,13 +247,13 @@ class GlobalServer:
         return self.model
 
     def init_alg(self, alg):
-        if alg == 'fedavg' or alg == 'fedprox' or alg == 'fedchem':
+        if alg == 'FedAvg' or alg == 'FedProx' or alg == 'FedChem':
             self.__alg = FedAvg()
-        elif alg == 'fedsgd':
+        elif alg == 'FedSGD':
             self.__alg = FedSGD(self.lr)
-        elif alg == 'fedadam':
+        elif alg == 'FedAdam':
             self.__alg = FedAdam(beta1=self.beta1, beta2=self.beta2, epsilon=self.__epsilons, lr=self.lr, device=self.device)
-        elif alg == 'fedlg':
+        elif alg == 'FedLG':
             self.__alg = FedLG(self.proj_dims, self.lanczos_iter, self.device)
         else:
             raise ValueError('\nSelect an algorithm to get the aggregated model.\n')
@@ -261,14 +261,14 @@ class GlobalServer:
         print('\nUsing {} algorithm.\n'.format(str(alg)))
 
     def aggregate(self, participant, model_state, alg):
-        if alg == 'fedlg':
+        if alg == 'FedLG':
             self.__alg.aggregate(self.__epsilons[participant], model_state,
                                  is_open_access=True if (participant in self.open_access) else False)
-        elif alg == 'fedavg' or alg == 'fedprox' or alg == 'fedchem':
+        elif alg == 'FedAvg' or alg == 'FedProx' or alg == 'FedChem':
             self.__alg.aggregate(model_state)
-        elif alg == 'fedsgd':
+        elif alg == 'FedSGD':
             self.__alg.aggregate(model_state)
-        elif alg == 'fedadam':
+        elif alg == 'FedAdam':
             self.__alg.aggregate(model_state)
         else:
             raise ValueError('\nSelect an algorithm to get the aggregated model.\n')
