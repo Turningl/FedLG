@@ -114,34 +114,48 @@ def main(args, dataset, model):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--alg', default='fedlg', type=str, help='fedavg, fedprox, fedsgd, fedlg, fedadam, fedchem')
-    parser.add_argument('--root', type=str, default='MoleculeNet', help='MoleculeNet, DrugBank, BIOSNAP, LITPCBA, CoCrystal')
+    parser = argparse.ArgumentParser(description='Federated Learning Lanczos Graph')
+    parser.add_argument('--alg', type=str, choices=['FedAvg, FedProx, FedSGD, FedLG, FedAdam, FedChem'],
+                        help='algorithm options, start with the choosed algorithm.')
+    parser.add_argument('--root', type=str, choices=['MoleculeNet, DrugBank, BIOSNAP, LITPCBA, CoCrystal'],
+                        help='choose the dataset, start with the path to dataset dir.')
     parser.add_argument('--dataset', default='bbbp', type=str)
 
-    parser.add_argument('--node_size', default=16, type=int)
-    parser.add_argument('--bond_size', default=16, type=int)
-    parser.add_argument('--hidden_size', default=15, type=int)
+    parser.add_argument('--node_size', default=16, type=int,
+                        help='number of atom size.')
+    parser.add_argument('--bond_size', default=16, type=int,
+                        help='number of bond size.')
+    parser.add_argument('--hidden_size', default=15, type=int,
+                        help='initial hidden size.')
     parser.add_argument('--extend_dim', default=4, type=float)
-    parser.add_argument('--output_size', default=1, type=int)
-    parser.add_argument('--model', default='MPNN', type=str, help='MPNN, GCN, GAT')
-    parser.add_argument('--split', default='smi', type=str, help='smi, smi1, smi2, random')
+    parser.add_argument('--output_size', default=1, type=int,
+                        help='initial output size.')
+    parser.add_argument('--model', default='MPNN', type=str, choices=['MPNN, GCN, GAT'],
+                        help='Graph model algorithm of MPNN, GCN and GAT.')
+    parser.add_argument('--split', default='smi', type=str, choices=['smi, smi1, smi2, random'],
+                        help='Choose a data splitting method.')
     parser.add_argument('--dropout', default=0.1, type=float)
     parser.add_argument('--message_steps', default=3, type=int)
 
     parser.add_argument('--num_clients', default=4, type=int)
     parser.add_argument('--alpha', default=0.1, type=float)
     parser.add_argument('--null_value', default=-1, type=float)
-    parser.add_argument('--seed', default=4567, type=int, help='1234, 4567, 7890')
+    parser.add_argument('--seed', default=4567, type=int, choices=[1234, 4567, 7890],
+                        help='Initialize random number seeds for model training and data splitting.')
     parser.add_argument('--weight_decay', default=1e-5, type=float)
 
-    parser.add_argument('--eps', type=str, default='mixgauss1', help='epsilon file name')
+    parser.add_argument('--eps', type=str, default='mixgauss1',
+                        help='epsilon file name')
     parser.add_argument('--constant', type=float, default=2000)
-    parser.add_argument('--delta', type=float, default=1e-5, help='differential privacy parameter')
-    parser.add_argument('--dp', default=True, type=bool, help='if True, use differential privacy')
+    parser.add_argument('--delta', type=float, default=1e-5,
+                        help='differential privacy parameter')
+    parser.add_argument('--dp', default=True, type=bool, choices=[True, False],
+                        help='if True, use differential privacy')
 
-    parser.add_argument('--batch_size', default=32, type=int, help='32, 64, 128')
-    parser.add_argument('--device', default='cuda', type=str)
+    parser.add_argument('--batch_size', default=32, type=int,
+                        choices=[32, 64, 128])
+    parser.add_argument('--device', default='cuda', type=str,
+                        choices=['cuda', 'cpu'])
     parser.add_argument('--save_dir', default='results', type=str)
 
     parser.add_argument('--beta1', default=0.9, type=float)
@@ -150,8 +164,10 @@ if __name__ == '__main__':
     parser.add_argument('--proj_dims', default=1, type=int)
     parser.add_argument('--lanczos_iter', default=8, type=int)
     parser.add_argument('--global_round', default=200, type=int)
-    parser.add_argument('--lr', default=0.001, type=float)
-    parser.add_argument('--clip', default=0.5, type=float, help='1.0, 1.5, 2.0')
+    parser.add_argument('--lr', default=0.001, type=float,
+                        choices=[0.1, 0.001, 0.0001])
+    parser.add_argument('--clip', default=0.5, type=float,
+                        choices=[1.0, 1.5, 2.0])
     # parser.add_argument('--anti_noise', default=0, type=float, help='0.1, 0.15, 0.2')
 
     args = parser.parse_args()
@@ -169,4 +185,3 @@ if __name__ == '__main__':
     # accountants = []
     architecture = Mol_architecture(args) if args.root in ['MoleculeNet', 'LITPCBA'] else DMol_architecture(args)
     main(args, dataset, architecture)
-
