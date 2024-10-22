@@ -69,7 +69,7 @@ usage: main.py [--alg] [--root] [--dataset] [--node_size] [--bond_size] [--hidde
 
 optional arguments:
   --alg              federated learning algorithm:
-                     fedavg, fedprox, fedsgd, fedlg, fedadam, fedchem
+                     FedAvg, FedProx, FedSGD, FedLG, FedAdam, FedChem
   --root             root directory for differernt molecular discovery databases: 
                      MoleculeNet, DrugBank, BIOSNAP, LITPCBA, CoCrystal
   --dataset          In different root directory, choose dataset of different databases
