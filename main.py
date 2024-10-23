@@ -120,7 +120,7 @@ if __name__ == '__main__':
     parser.add_argument('--root', type=str, choices=['MoleculeNet, DrugBank, BIOSNAP, LITPCBA, CoCrystal'],
                         help='choose the dataset, start with the path to dataset dir.')
     parser.add_argument('--dataset', default='bbbp', type=str,
-                        help='dataset is directory related to root.')
+                        help='dataset is directly related to the root.')
 
     parser.add_argument('--node_size', default=16, type=int,
                         help='number of atom size.')
