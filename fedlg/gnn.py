@@ -24,17 +24,22 @@ class Mol_architecture(nn.Module):
         exec('self.model = {}(args.hidden_size, args.bond_size, args.extend_dim, args.dropout)'.format(args.model))
         self.mol_readout = GlobalPool(args)
         self.message_steps = args.message_steps
-        self.mol_flat = nn.Sequential(nn.Linear(args.hidden_size * args.extend_dim * 5, args.hidden_size * args.extend_dim, bias=True), nn.RReLU())
-        self.mol_out = nn.Sequential(nn.Linear(args.hidden_size * args.extend_dim, args.output_size, bias=True), nn.RReLU())
+        self.mol_flat = nn.Sequential(nn.Linear(args.hidden_size * args.extend_dim * 5,
+                                                args.hidden_size * args.extend_dim, bias=True),
+                                      nn.RReLU())
+        self.mol_out = nn.Sequential(nn.Linear(args.hidden_size * args.extend_dim,
+                                               args.output_size, bias=True),
+                                     nn.RReLU())
 
     def forward(self, dataset):
         x, edge_index, edge_attr, batch = dataset.x, dataset.edge_index, dataset.edge_attr, dataset.batch
 
         x = self.mol_lin(x)
 
-        hmol = None
-        for i in range(self.message_steps):
-            x, hmol = self.model(x, edge_index, edge_attr, h=hmol, batch=batch)
+        if hasattr(self, 'model'):
+            hmol = None
+            for i in range(self.message_steps):
+                x, hmol = self.model(x, edge_index, edge_attr, h=hmol, batch=batch)
 
         x = self.mol_readout(x, batch)
         x = self.mol_flat(x)
@@ -47,38 +52,47 @@ class DMol_architecture(nn.Module):
     def __init__(self, args):
         super(DMol_architecture, self).__init__()
         self.message_steps = 3
-        self.mol1_lin0 = nn.Sequential(nn.Linear(args.node_size, args.node_size * args.extend_dim, bias=True),
+        self.mol1_lin0 = nn.Sequential(nn.Linear(args.node_size,
+                                                 args.node_size * args.extend_dim, bias=True),
                                        nn.RReLU())
-        self.mol2_lin0 = nn.Sequential(nn.Linear(args.node_size, args.node_size * args.extend_dim, bias=True),
+        self.mol2_lin0 = nn.Sequential(nn.Linear(args.node_size,
+                                                 args.node_size * args.extend_dim, bias=True),
                                        nn.RReLU())
 
         exec('self.mol1_conv= {}(args.node_size, args.bond_size, args.extend_dim, args.dropout)'.format(args.model))
         exec('self.mol2_conv= {}(args.node_size, args.bond_size, args.extend_dim, args.dropout)'.format(args.model))
         self.mol1_readout, self.mol2_readout = GlobalPool(args), GlobalPool(args)
 
-        self.mol1_flat = nn.Linear(args.node_size * args.extend_dim * 5, args.node_size * args.extend_dim)
-        self.mol2_flat = nn.Linear(args.node_size * args.extend_dim * 5, args.node_size * args.extend_dim)
+        self.mol1_flat = nn.Linear(args.node_size * args.extend_dim * 5,
+                                   args.node_size * args.extend_dim)
+        self.mol2_flat = nn.Linear(args.node_size * args.extend_dim * 5,
+                                   args.node_size * args.extend_dim)
 
-        self.lin_out1 = nn.Linear(args.node_size * args.extend_dim * 2 + self.message_steps * 2, args.hidden_size)
-        self.lin_out2 = nn.Linear(args.hidden_size, args.output_size)
+        self.lin_out1 = nn.Linear(args.node_size * args.extend_dim * 2 + self.message_steps * 2,
+                                  args.hidden_size)
+        self.lin_out2 = nn.Linear(args.hidden_size,
+                                  args.output_size)
 
     def forward(self, mol1, mol2):
         xm1 = self.mol1_lin0(mol1.x)
         xm2 = self.mol2_lin0(mol2.x)
 
-        hmol1, hmol2 = None, None
         fusion = []
-        for i in range(self.message_steps):
-            xm1, hmol1 = self.mol1_conv(xm1, mol1.edge_index, mol1.edge_attr, h=hmol1, batch=mol1.batch)
-            xm2, hmol2 = self.mol2_conv(xm2, mol2.edge_index, mol2.edge_attr, h=hmol2, batch=mol2.batch)
-            fusion.append(dot_and_global_pool(xm1, xm2, mol1.batch, mol2.batch))
+        if hasattr(self, 'mol1_conv') and hasattr(self, 'mol2_conv'):
+            hmol1, hmol2 = None, None
+            for i in range(self.message_steps):
+                xm1, hmol1 = self.mol1_conv(xm1, mol1.edge_index, mol1.edge_attr, h=hmol1, batch=mol1.batch)
+                xm2, hmol2 = self.mol2_conv(xm2, mol2.edge_index, mol2.edge_attr, h=hmol2, batch=mol2.batch)
+                fusion.append(dot_and_global_pool(xm1, xm2, mol1.batch, mol2.batch))
 
         outm1 = self.mol1_readout(xm1, mol1.batch)
         outm2 = self.mol2_readout(xm2, mol2.batch)
         outm1 = self.mol1_flat(outm1)
         outm2 = self.mol2_flat(outm2)
 
-        out = self.lin_out1(torch.cat([outm1, outm2, torch.cat(fusion, dim=-1)], dim=-1))
+        out = self.lin_out1(torch.cat([outm1, outm2,
+                                       torch.cat(fusion, dim=-1)],
+                            dim=-1))
         out = self.lin_out2(out)
         return out
 
@@ -86,14 +100,18 @@ class DMol_architecture(nn.Module):
 class GCN(nn.Module):
     def __init__(self, node_size, bond_size, extend_dim, dropout):
         super(GCN, self).__init__()
-        self.gconv = gcnconv(node_size * extend_dim, node_size * extend_dim)
-        self.norm_block = nn.Sequential(nn.LayerNorm(node_size * extend_dim), nn.Dropout(p=dropout))
+        self.gconv = gcnconv(node_size * extend_dim,
+                             node_size * extend_dim)
+        self.norm_block = nn.Sequential(nn.LayerNorm(node_size * extend_dim),
+                                        nn.Dropout(p=dropout))
         self.act = nn.ReLU()
 
     def forward(self, x, edge_index, edge_attr, h, batch):
         identity = x
-        x = self.norm_block(x)
-        x = self.gconv(x, edge_index)
+
+        if hasattr(self, 'norm_block') and hasattr(self, 'gconv'):
+            x = self.norm_block(x)
+            x = self.gconv(x, edge_index)
 
         x = x + identity
         x = self.act(x)
@@ -116,14 +134,18 @@ class GATLayer(nn.Module):
 class GAT(nn.Module):
     def __init__(self, node_size, bond_size, extend_dim, dropout):
         super(GAT, self).__init__()
-        self.gatconv = gatconv(node_size * extend_dim, node_size * extend_dim)
-        self.norm_block = nn.Sequential(nn.LayerNorm(node_size * extend_dim), nn.Dropout(p=dropout))
+        self.gatconv = gatconv(node_size * extend_dim,
+                               node_size * extend_dim)
+        self.norm_block = nn.Sequential(nn.LayerNorm(node_size * extend_dim),
+                                        nn.Dropout(p=dropout))
         self.act = nn.ReLU()
 
     def forward(self, x, edge_index, edge_attr, h, batch):
         identity = x
-        x = self.norm_block(x)
-        x = self.gatconv(x, edge_index)
+
+        if hasattr(self, 'norm_block') and hasattr(self, 'gatconv'):
+            x = self.norm_block(x)
+            x = self.gatconv(x, edge_index)
 
         x = x + identity
         x = self.act(x)
@@ -137,12 +159,15 @@ class GAT(nn.Module):
 class SAGE(nn.Module):
     def __init__(self, node_size, bond_size, extend_dim, dropout):
         super(SAGE, self).__init__()
-        self.sgconv = sageconv(node_size, node_size * extend_dim)
+        self.sgconv = sageconv(node_size,
+                               node_size * extend_dim)
 
     def forward(self, x, edge_index, edge_attr, h, batch):
         identity = x
-        x = self.norm_block(x)
-        x = self.sgconv(x, edge_index)
+
+        if hasattr(self, 'norm_block') and hasattr(self, 'sgconv'):
+            x = self.norm_block(x)
+            x = self.sgconv(x, edge_index)
 
         x = x + identity
         x = self.act(x)
@@ -208,9 +233,12 @@ class TripletMessage(MessagePassing):
 class MPNN(nn.Module):
     def __init__(self, node_size, bond_size, extend_dim, dropout):
         super(MPNN, self).__init__()
-        self.gru = nn.GRU(node_size * extend_dim, node_size * extend_dim)
-        self.norm_block = nn.Sequential(nn.LayerNorm(node_size * extend_dim), nn.Dropout(p=dropout))
-        self.conv = TripletMessage(node_size * extend_dim,  bond_size)
+        self.gru = nn.GRU(node_size * extend_dim,
+                          node_size * extend_dim)
+        self.norm_block = nn.Sequential(nn.LayerNorm(node_size * extend_dim),
+                                        nn.Dropout(p=dropout))
+        self.conv = TripletMessage(node_size * extend_dim,
+                                   bond_size)
         self.act = nn.ReLU()
 
     def forward(self, x, edge_index, edge_attr, h=None, batch=None):
@@ -221,7 +249,7 @@ class MPNN(nn.Module):
         # message passing and update
         x = self.conv(x, edge_index, edge_attr)
 
-        if self.gru is not None:
+        if hasattr(self, 'gru'):
             x = torch.celu(x)
             out, h = self.gru(x.unsqueeze(0), h)
             x = out.squeeze(0)
@@ -241,7 +269,7 @@ class GlobalPool(torch.nn.Module):
         self.args = args
 
     def forward(self, x, batch):
-        if self.args.model == 'attentiveFP':
+        if self.args.model == 'AttentiveFP':
             mean, sum, topk = (global_mean_pool(x, batch.unique()),
                                global_add_pool(x, batch.unique()),
                                global_sort_pool(x, batch.unique(),
