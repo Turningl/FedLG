@@ -11,9 +11,10 @@ import numpy as np
 import pandas as pd
 from fedlg.server import GlobalServer
 from fedlg.client import SimulatedDatabase
+from utils.set_epsilons import prepare_local_differential_privacy
 from fedlg.gnn import Mol_architecture, DMol_architecture
 from utils.dataset import MoleculeNetDataset, DrugBankDataset, LITPCBADataset, BIOSNAPDataset, CoCrystalDataset
-from utils.distribution import molecule_dirichlet_distribution, random_distribution, prepare_local_differential_privacy
+from utils.distribution import molecule_dirichlet_distribution, random_distribution
 from utils.nnutils import model_test_classifier, model_test_regression
 from utils.save_func import save_progress, print_rmse_accoutant, print_accuracy_accoutant
 import warnings
