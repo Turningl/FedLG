@@ -67,34 +67,3 @@ def random_distribution(args, dataset, sample_clients, alpha, null_value=-1, see
 
     torch.save(scaffold_split_map, storage_path)
     return scaffold_split_map
-
-
-def set_epsilons_from_distributions(args, N):
-    np.random.seed(args.seed + 1)
-    public_num, private_num = 1, N - 1
-    print('Set epsilons')
-    with open('./epsilons/{}.txt'.format(args.eps), 'r') as rfile:
-        lines = rfile.readlines()
-        num_lines = len(lines)
-
-        dists = []
-        for i in range(num_lines - 2):
-            print(lines[i].strip('\n'))
-            values = lines[i].split()
-            dist = {'mean': float(values[1]), 'std': float(values[2])}
-            dists.append(dist)
-
-        # generate samples from the distribution
-        samples1 = np.random.normal(loc=dists[0]['mean'], scale=dists[0]['std'], size=private_num).tolist()
-        samples2 = np.random.normal(loc=dists[1]['mean'], scale=dists[1]['std'], size=public_num).tolist()
-
-    epsilons = np.concatenate([samples1, samples2])
-    # np.random.shuffle(epsilons)
-    return epsilons
-
-
-def prepare_local_differential_privacy(args, num_clients):
-    epsilons = None
-    if args.dp:
-        epsilons = set_epsilons_from_distributions(args, num_clients)
-    return epsilons
