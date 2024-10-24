@@ -4,7 +4,6 @@
 
 import configparser
 import numpy as np
-import pandas as pd
 
 def set_epsilons_from_distributions(args, N):
     np.random.seed(args.seed + 1)
@@ -38,7 +37,7 @@ def set_epsilons_from_distributions(args, N):
     #threshold = [float(t) for t in config.get('threshold', 'threshold').splitlines() if t.strip()]
 
     # print("Probabilities:", prob)
-    #print("Thresholds:", threshold)
+    # print("Thresholds:", threshold)
 
     # np.random.shuffle(epsilons)
     return epsilons
