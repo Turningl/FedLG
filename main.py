@@ -116,12 +116,12 @@ def main(args, dataset, model):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Federated Learning Lanczos Graph')
-    parser.add_argument('--alg', type=str, choices=['FedAvg, FedProx, FedSGD, FedLG, FedAdam, FedChem'],
+    parser.add_argument('--alg', type=str, choices=['FedAvg, FedProx, FedSGD, FedLG, FedAdam, FedChem'], default='FedLG',
                         help='algorithm options, start with the choosed algorithm.')
-    parser.add_argument('--root', type=str, choices=['MoleculeNet, DrugBank, BIOSNAP, LITPCBA, CoCrystal'],
+    parser.add_argument('--root', type=str, choices=['MoleculeNet, DrugBank, BIOSNAP, LITPCBA, CoCrystal'], default='MoleculeNet',
                         help='choose the dataset, start with the path to dataset dir.')
     parser.add_argument('--dataset', default='bbbp', type=str,
-                        help='dataset is directly related to the root.')
+                        help='dataset is directly related to root.')
 
     parser.add_argument('--node_size', default=16, type=int,
                         help='number of atom size.')
@@ -187,3 +187,4 @@ if __name__ == '__main__':
     # accountants = []
     architecture = Mol_architecture(args) if args.root in ['MoleculeNet', 'LITPCBA'] else DMol_architecture(args)
     main(args, dataset, architecture)
+
