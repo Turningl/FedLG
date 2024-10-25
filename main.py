@@ -116,9 +116,9 @@ def main(args, dataset, model):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Federated Learning Lanczos Graph')
-    parser.add_argument('--alg', type=str, choices=['FedAvg, FedProx, FedSGD, FedLG, FedAdam, FedChem'], default='FedLG',
+    parser.add_argument('--alg', type=str, choices=['FedAvg, FedProx, FedSGD, FedLG, FedAdam, FedChem'],
                         help='algorithm options, start with the choosed algorithm.')
-    parser.add_argument('--root', type=str, choices=['MoleculeNet, DrugBank, BIOSNAP, LITPCBA, CoCrystal'], default='MoleculeNet',
+    parser.add_argument('--root', type=str, choices=['MoleculeNet, DrugBank, BIOSNAP, LITPCBA, CoCrystal'],
                         help='choose the dataset, start with the path to dataset dir.')
     parser.add_argument('--dataset', default='bbbp', type=str,
                         help='dataset is directly related to root.')
