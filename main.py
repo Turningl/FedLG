@@ -116,11 +116,16 @@ def main(args, dataset, model):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Federated Learning Lanczos Graph')
-    parser.add_argument('--alg', type=str, choices=['FedAvg, FedProx, FedSGD, FedLG, FedAdam, FedChem'],
+    parser.add_argument('--alg', type=str, choices=['FedAvg, FedProx, FedSGD, FedLG, FedAdam, FedChem'], default='FedLG',
                         help='algorithm options, start with the choosed algorithm.')
-    parser.add_argument('--root', type=str, choices=['MoleculeNet, DrugBank, BIOSNAP, LITPCBA, CoCrystal'],
+    parser.add_argument('--root', type=str, choices=['MoleculeNet, DrugBank, BIOSNAP, LITPCBA, CoCrystal'], default='MoleculeNet',
                         help='choose the dataset, start with the path to dataset dir.')
     parser.add_argument('--dataset', default='bbbp', type=str,
+                        choices=['MoleculeNet: bbbp', 'MoleculeNet: bace', 'MoleculeNet: sider', 'MoleculeNet: tox21',
+                                 'MoleculeNet: toxcast','MoleculeNet: esol', 'MoleculeNet: lipophilicity', 'MoleculeNet: freesolv',
+                                 'LIT-PCBA: ALDH1', 'LIT-PCBA: FEN1', 'LIT-PCBA: GBA', 'LIT-PCBA: KAT2A', 
+                                 'LIT-PCBA: MAPK1', 'LIT-PCBA: PKM2', 'LIT-PCBA: VDR',
+                                 'DrugBank: DrugBank', 'CoCrystal: CoCrystal', 'BIOSNAP: BIOSNAP'],
                         help='dataset is directly related to root.')
 
     parser.add_argument('--node_size', default=16, type=int,
