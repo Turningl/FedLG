@@ -6,7 +6,7 @@ import torch
 import numpy as np
 import scipy as sp
 from utils.lanczos import Lanczos
-
+from utils.save_func import print_init_alg_info, print_average_info
 
 def add_weights(num_vars, model_state, agg_model_state):
     for i in range(num_vars):
@@ -15,8 +15,9 @@ def add_weights(num_vars, model_state, agg_model_state):
         else:
             b = torch.cat([agg_model_state[i], torch.unsqueeze(model_state[i], 0)], 0)
     return [torch.unsqueeze(model_state[i], 0)
-            if not len(agg_model_state) else torch.cat([agg_model_state[i], torch.unsqueeze(model_state[i], 0)], 0) for
-            i in range(num_vars)]
+            if not len(agg_model_state) else torch.cat([agg_model_state[i],
+                                                        torch.unsqueeze(model_state[i], 0)], 0)
+            for i in range(num_vars)]
 
 
 class FedAvg:
@@ -34,7 +35,8 @@ class FedAvg:
         self.__model_state = add_weights(self.num_vars, update_model_state, self.__model_state)
 
     def average(self):
-        mean_updates = [torch.mean(self.__model_state[i], 0).reshape(self.shape_vars[i]) for i in range(self.num_vars)]
+        mean_updates = [torch.mean(self.__model_state[i], 0).reshape(self.shape_vars[i])
+                        for i in range(self.num_vars)]
         self.__model_state = []
         return mean_updates
 
@@ -246,6 +248,7 @@ class GlobalServer:
     def init_global_model(self):
         return self.model
 
+    @print_init_alg_info('Initialization')
     def init_alg(self, alg):
         if alg == 'FedAvg' or alg == 'FedProx' or alg == 'FedChem':
             self.__alg = FedAvg()
@@ -258,7 +261,7 @@ class GlobalServer:
         else:
             raise ValueError('\nSelect an algorithm to get the aggregated model.\n')
 
-        print('\nUsing {} algorithm.\n'.format(str(alg)))
+        print('\n{} algorithm.\n'.format(str(alg)))
 
     def aggregate(self, participant, model_state, alg):
         if alg == 'FedLG':
@@ -273,6 +276,7 @@ class GlobalServer:
         else:
             raise ValueError('\nSelect an algorithm to get the aggregated model.\n')
 
+    @print_average_info
     def update(self):
         mean_state = self.__alg.average()
         # mean_updates = dict(zip(self.state_dict_key, mean_state))
