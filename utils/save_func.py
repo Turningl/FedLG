@@ -43,3 +43,28 @@ def print_accuracy_accoutant(test_results):
     print('the max acc is:%.4f\n' % np.max(test_results))
     print('-------------------------------------------------------------------------------------')
     return np.max(test_results)
+
+
+def print_init_alg_info(res):
+    def _print_init_alg_info(func):
+        def wrapper(*args, **kwargs):
+            print('')
+            print('-------------------------------------------------------------------------------------')
+            print(res + '!!!')
+            print('')
+            print('Execute ' + 'Federated learning algorithm. Using the following algorithm:')
+            return func(*args, **kwargs)
+
+        return wrapper
+
+    return _print_init_alg_info
+
+def print_average_info(func):
+    def wrapper(*args, **kwargs):
+        print('')
+        print('-------------------------------------------------------------------------------------')
+        print('')
+        print('Execute ' + 'model state dict loading!')
+        return func(*args, **kwargs)
+
+    return wrapper
