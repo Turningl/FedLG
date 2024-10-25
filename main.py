@@ -15,7 +15,7 @@ from utils.set_epsilons import prepare_local_differential_privacy
 from fedlg.gnn import Mol_architecture, DMol_architecture
 from utils.dataset import MoleculeNetDataset, DrugBankDataset, LITPCBADataset, BIOSNAPDataset, CoCrystalDataset
 from utils.distribution import molecule_dirichlet_distribution, random_distribution
-from utils.nnutils import model_test_classifier, model_test_regression
+from utils.nnutils import model_test_classification, model_test_regression
 from utils.save_func import save_progress, print_rmse_accoutant, print_accuracy_accoutant
 import warnings
 
@@ -94,7 +94,7 @@ def main(args, dataset, model):
 
         # classification
         elif dataset.dataset_name in dataset.dataset_names['classification']:
-            test_acc, test_loss = model_test_classifier(args, global_model, test)
+            test_acc, test_loss = model_test_classification(args, global_model, test)
             print('current global model has test acc: %.4f  test loss: %.4f' % (test_acc, test_loss))
 
             accuracy_accountant.append(test_acc)
