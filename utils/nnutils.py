@@ -15,7 +15,7 @@ from collections import defaultdict
 from utils.chemutils import extract_batch_data
 
 
-def model_test_classifier(args, model, test):
+def model_test_classification(args, model, test):
     model.eval().to(args.device)
     test_dataset = DataLoader(test, batch_size=args.batch_size, shuffle=True)
 
