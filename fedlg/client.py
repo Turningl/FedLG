@@ -94,7 +94,7 @@ class SimulatedDatabase:
     # local model update function
     def local_update(self):
         model = self.model.train()
-        global_model = copy.deepcopy(model)
+        w_model = copy.deepcopy(model)
 
         optimizer = Adam(model.parameters(), lr=self.lr, weight_decay=self.weight_decay)
 
@@ -134,7 +134,7 @@ class SimulatedDatabase:
 
                 if self.alg == 'FedProx':
                     proximal_term = 0
-                    for w, w_global in zip(model.parameters(), global_model.parameters()):
+                    for w, w_global in zip(model.parameters(), w_model.parameters()):
                         proximal_term += self.mu / 2 * torch.norm(w - w_global, 2)
                     loss += proximal_term
 
@@ -142,9 +142,9 @@ class SimulatedDatabase:
                     if self.warmup:
                         with torch.no_grad():
                             if dataset.related_title == 'DrugBank' or dataset.related_title == 'BIOSNAP' or dataset.related_title == 'CoCrystal':
-                                y_pred_global = global_model(mol1_batch, mol2_batch)
+                                y_pred_global = w_model(mol1_batch, mol2_batch)
                             elif dataset.related_title == 'MoleculeNet' or dataset.related_title == 'LITPCBA':
-                                y_pred_global = global_model(mol_data)
+                                y_pred_global = w_model(mol_data)
                         lossg_label = criterion(y_pred_global, y_true)
                         lossl_label = criterion(y_pred, y_true)
 
