@@ -1,0 +1,14 @@
+[distribution1]
+mean = 1.0
+std =0.1
+
+[distribution2]
+mean = 10.0
+std = 1.0
+
+[prob]
+prob1 = 0.9
+prob2 = 0.1
+
+[threshold]
+2.0
