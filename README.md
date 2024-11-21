@@ -1,4 +1,7 @@
 # A federated graph learning method to multi-party collaboration for molecular discovery
+<p align="center">
+  <img src="img/Fig. 1.png" /> 
+</p>
 This is an implementation for Federated Learning Lanczos Graph (FedLG).
 
 
@@ -14,6 +17,7 @@ This is an implementation for Federated Learning Lanczos Graph (FedLG).
     - [DrugBank](#drugbank)
     - [BIOSNAP](#biosnap)
     - [CoCrystal](#cocrystal)
+  - [Preprocess](#preprocess)
   - [Usage](#usage)
   - [Acknowledgements](#acknowledgements)
 
@@ -65,46 +69,47 @@ CUDA_VISIBLE_DEVICES=${your_gpu_id} python main.py --save_dir 'result' --alg fed
 All parameters of main:
 ```
 usage: main.py [--alg] [--root] [--dataset] [--node_size] [--bond_size] [--hidden_size] [--extend_dim] [--output_size] [--model] [--split] [dropout] [--message_steps] [--num_clients] [--alpha] [--null_value] [--seed] 
-               [--weight_decay] [--eps] [constant] [--delta] [--dp] [--batch_size] [--device] [--save_dir] [--beta1] [--beta2] [--local_round] [--proj_dims] [--lanczos_iter] [--global_round] [--lr] [--clip]
+               [--weight_decay] [--eps] [constant] [--delta] [--dp] [--batch_size] [--device] [--save_dir] [--beta1] [--beta2] [--local_round] [--proj_dims] [--lanczos_iter] [--global_round] [--comm_optimization] [--lr] [--clip]
 
 optional arguments:
-  --alg              federated learning algorithm:
-                     FedAvg, FedProx, FedSGD, FedLG, FedAdam, FedChem
-  --root             root directory for differernt molecular discovery databases: 
-                     MoleculeNet, DrugBank, BIOSNAP, LITPCBA, CoCrystal
-  --dataset          In different root directory, choose dataset of different databases
-  --node_size        molecular node size
-  --bond_size        molecular bond size
-  --hidden_size      hidden size
-  --extend_dim       extend dim for neural network
-  --output_size      output size
-  --model            graph neural network:
-                     MPNN, GCN, GAT
-  --split            split type for different root and dataset:
-                     smi, smi1, smi2
-  --drooput          dropout rate
-  --message steps    message step for graph neural network
-  --num_clients      clients number, here we set the max clients number is up to 4
-  --alpha            alpha for molecule dirichlet distribution
-  --null_value       null value         
-  --seed             fixed data initialization and training seed
-  --weight_decay     weight decay for optimizer
-  --eps              epsilons distribution
-  --constant         constant for local differently privacy
-  --delta            differential privacy parameter
-  --dp               if True, use differential privacy
-  --batch_size       batch size of the model training:
-                     32, 64 or 128  
-  --device           cuda or cpu
-  --save_dir         results save directory, the model test results is saved to ./results/
-  --beta1            beta1 for Adam optimizer
-  --beta2            beta2 for Adam optimizer
-  --local_round      local model training round
-  --proj_dims        project dim of lanczos algorithm
-  --lanczos_iter     the iterations of lanczos
-  --global_round     global model training round
-  --lr               the learning rate of graph model
-  --clip             clip value for local differently privacy
+  --alg                 federated learning algorithm:
+                        fedavg, fedprox, fedsgd, fedlg, fedadam, fedchem
+  --root                root directory for differernt molecular discovery databases: 
+                        MoleculeNet, DrugBank, BIOSNAP, LITPCBA, CoCrystal
+  --dataset             In different root directory, choose dataset of different databases
+  --node_size           molecular node size
+  --bond_size           molecular bond size
+  --hidden_size         hidden size
+  --extend_dim          extend dim for neural network
+  --output_size         output size
+  --model               graph neural network:
+                        MPNN, GCN, GAT
+  --split               split type for different root and dataset:
+                        smi, smi1, smi2
+  --drooput             dropout rate
+  --message steps       message step for graph neural network
+  --num_clients         clients number, here we set the max clients number is up to 4
+  --alpha               alpha for molecule dirichlet distribution
+  --null_value          null value         
+  --seed                fixed data initialization and training seed
+  --weight_decay        weight decay for optimizer
+  --eps                 epsilons distribution
+  --constant            constant for local differently privacy
+  --delta               differential privacy parameter
+  --dp                  if True, use differential privacy
+  --batch_size          batch size of the model training:
+                        32, 64 or 128  
+  --device              cuda or cpu
+  --save_dir            results save directory, the model test results is saved to ./results/
+  --beta1               beta1 for Adam optimizer
+  --beta2               beta2 for Adam optimizer
+  --local_round         local model training round
+  --proj_dims           project dim of lanczos algorithm
+  --lanczos_iter        the iterations of lanczos
+  --global_round        global model training round
+  --comm_optimization   using Bayesian Optimization or not
+  --lr                  the learning rate of graph model
+  --clip                clip value for local differently privacy
 ```
 
 ## Acknowledgements
