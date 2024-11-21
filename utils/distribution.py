@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 # @Author : liang
-# @Email : zl16035056@163.com
 # @File : distribution.py
 
 
