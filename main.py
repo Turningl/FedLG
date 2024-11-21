@@ -15,8 +15,8 @@ from utils.set_epsilons import prepare_local_differential_privacy
 from fedlg.gnn import Mol_architecture, DMol_architecture
 from utils.dataset import MoleculeNetDataset, DrugBankDataset, LITPCBADataset, BIOSNAPDataset, CoCrystalDataset
 from utils.distribution import molecule_dirichlet_distribution, random_distribution
-from utils.nnutils import model_test_classification, model_test_regression
-from utils.save_func import save_progress, print_rmse_accoutant, print_accuracy_accoutant
+from utils.nnutils import inference_test_classification, inference_test_regression
+from utils.saveutils import save_progress, print_rmse_accoutant, print_accuracy_accoutant
 import warnings
 
 warnings.filterwarnings('ignore')
@@ -63,6 +63,7 @@ def main(args, dataset, model):
     print('the communication_round is %d' % communication_round)
 
     accuracy_accountant, rmse_accoutant = [], []
+    model_states, means = None, None
 
     # start communication
     for r in range(communication_round):
@@ -76,6 +77,10 @@ def main(args, dataset, model):
             # delivery model
             participant.download(copy.deepcopy(server_model))
 
+            # update participant open_access model states and means information
+            if model_states:
+                participant.update_comm_optimization(model_states=model_states, means=means, participant=(idx not in server.open_access))
+
             # local update
             model_state = participant.local_update()
 
@@ -85,19 +90,24 @@ def main(args, dataset, model):
         # load average weight
         global_model = server.update()
 
+        # fetch model states and means information with communication optimization
+        if args.comm_optimization:
+            model_states, means = server.fetch_comm_optimization()
+
         # regression
         if dataset.dataset_name in dataset.dataset_names['regression']:
-            test_rmse, test_loss = model_test_regression(args, global_model, test)
+            test_rmse, test_loss = inference_test_regression(args, global_model, test)
             print('current global model has test rmse: %.4f  test loss: %.4f' % (test_rmse, test_loss))
 
             rmse_accoutant.append(test_rmse)
 
         # classification
         elif dataset.dataset_name in dataset.dataset_names['classification']:
-            test_acc, test_loss = model_test_classification(args, global_model, test)
+            test_acc, test_loss = inference_test_classification(args, global_model, test)
             print('current global model has test acc: %.4f  test loss: %.4f' % (test_acc, test_loss))
 
             accuracy_accountant.append(test_acc)
+
         # print('current global model has test loss: %.4f' % test_loss)
         # accuracy_accountant.append(test_accuracy)
 
@@ -116,14 +126,16 @@ def main(args, dataset, model):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Federated Learning Lanczos Graph')
-    parser.add_argument('--alg', type=str, choices=['FedAvg, FedProx, FedSGD, FedLG, FedAdam, FedChem'], default='FedLG',
+    parser.add_argument('--alg', type=str,
+                        choices=['FedAvg, FedProx, FedSGD, FedLG, FedAdam, FLIT'], default='FedAdam',
                         help='algorithm options, start with the choosed algorithm.')
-    parser.add_argument('--root', type=str, choices=['MoleculeNet, DrugBank, BIOSNAP, LITPCBA, CoCrystal'], default='MoleculeNet',
+    parser.add_argument('--root', type=str,
+                        choices=['MoleculeNet, DrugBank, BIOSNAP, LITPCBA, CoCrystal'], default='MoleculeNet',
                         help='choose the dataset, start with the path to dataset dir.')
-    parser.add_argument('--dataset', default='bbbp', type=str,
+    parser.add_argument('--dataset', type=str, default='bace',
                         choices=['MoleculeNet: bbbp', 'MoleculeNet: bace', 'MoleculeNet: sider', 'MoleculeNet: tox21',
-                                 'MoleculeNet: toxcast','MoleculeNet: esol', 'MoleculeNet: lipophilicity', 'MoleculeNet: freesolv',
-                                 'LIT-PCBA: ALDH1', 'LIT-PCBA: FEN1', 'LIT-PCBA: GBA', 'LIT-PCBA: KAT2A', 
+                                 'MoleculeNet: toxcast','MoleculeNet: esol', 'MoleculeNet: lipo', 'MoleculeNet: freesolv',
+                                 'LIT-PCBA: ALDH1', 'LIT-PCBA: FEN1', 'LIT-PCBA: GBA', 'LIT-PCBA: KAT2A',
                                  'LIT-PCBA: MAPK1', 'LIT-PCBA: PKM2', 'LIT-PCBA: VDR',
                                  'DrugBank: DrugBank', 'CoCrystal: CoCrystal', 'BIOSNAP: BIOSNAP'],
                         help='dataset is directly related to root.')
@@ -147,10 +159,12 @@ if __name__ == '__main__':
     parser.add_argument('--num_clients', default=4, type=int)
     parser.add_argument('--alpha', default=0.1, type=float)
     parser.add_argument('--null_value', default=-1, type=float)
-    parser.add_argument('--seed', default=4567, type=int, choices=[1234, 4567, 7890],
+    parser.add_argument('--seed', default=1234, type=int, choices=[1234, 4567, 7890],
                         help='Initialize random number seeds for model training and data splitting.')
     parser.add_argument('--weight_decay', default=1e-5, type=float)
 
+    parser.add_argument('--comm_optimization', default=False, type=bool,
+                        help='communication optimization')
     parser.add_argument('--eps', type=str, default='mixgauss1',
                         help='epsilon file name')
     parser.add_argument('--constant', type=float, default=2000)
@@ -167,27 +181,36 @@ if __name__ == '__main__':
 
     parser.add_argument('--beta1', default=0.9, type=float)
     parser.add_argument('--beta2', default=0.999, type=float)
+
     parser.add_argument('--local_round', default=10, type=int)
+    parser.add_argument('--global_round', default=200, type=int)
+
     parser.add_argument('--proj_dims', default=1, type=int)
     parser.add_argument('--lanczos_iter', default=8, type=int)
-    parser.add_argument('--global_round', default=200, type=int)
     parser.add_argument('--lr', default=0.001, type=float,
                         choices=[0.1, 0.001, 0.0001])
     parser.add_argument('--clip', default=0.5, type=float,
                         choices=[1.0, 1.5, 2.0])
+
+    parser.add_argument('--init', default=10, type=int, help='the count of initial random points')
+    parser.add_argument('--max_step', default=100, type=int, help='the maximum steps for Bayesian optimization')
     # parser.add_argument('--anti_noise', default=0, type=float, help='0.1, 0.15, 0.2')
 
     args = parser.parse_args()
     os.environ["CUDA_VISIBLE_DEVICES"] = '0'
 
+    # args.seed = seed
     exec("dataset = {}Dataset('./dataset/{}', '{}', '{}', {})".format(args.root, args.root, args.dataset, args.split, args.seed))
     # dataset = MolDataset(root='../dataset/' + args.root, name=args.dataset, split_seed=args.seed)
-    print('the dataset name: {}, the mol size: {}.'.format(args.dataset, len(dataset)))
+    print(dataset)
+    print()
+    print('the dataset name: {}, the mol size: {}.\n'.format(args.dataset, len(dataset)))
 
     args.num_clients = 3 if len(dataset) <= 2000 else 4
     args.node_size, args.bond_size = dataset.node_features, dataset.edge_features
     args.output_size = dataset.num_tasks
     print(args)
+    print()
 
     # accountants = []
     architecture = Mol_architecture(args) if args.root in ['MoleculeNet', 'LITPCBA'] else DMol_architecture(args)
