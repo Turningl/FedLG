@@ -15,21 +15,53 @@ from torch_geometric.utils import softmax, add_self_loops, remove_self_loops
 from torch_scatter.scatter import *
 from torch_geometric.nn.conv import MessagePassing
 from torch.nn.init import kaiming_uniform_, zeros_
+from torch_geometric.nn.inits import glorot_orthogonal
 
 
 class Mol_architecture(nn.Module):
     def __init__(self, args):
         super(Mol_architecture, self).__init__()
-        self.mol_lin = nn.Sequential(nn.Linear(args.node_size, args.hidden_size * args.extend_dim, bias=True), nn.RReLU())
-        exec('self.model = {}(args.hidden_size, args.bond_size, args.extend_dim, args.dropout)'.format(args.model))
+
+        self.mol_lin = nn.Sequential(
+            nn.Linear(args.node_size, args.hidden_size * args.extend_dim, bias=True),
+            nn.RReLU())
+
+        # getattr
+        self.model = globals()[args.model](args.hidden_size, args.bond_size, args.extend_dim, args.dropout)
+
         self.mol_readout = GlobalPool(args)
+
         self.message_steps = args.message_steps
-        self.mol_flat = nn.Sequential(nn.Linear(args.hidden_size * args.extend_dim * 5,
-                                                args.hidden_size * args.extend_dim, bias=True),
-                                      nn.RReLU())
-        self.mol_out = nn.Sequential(nn.Linear(args.hidden_size * args.extend_dim,
-                                               args.output_size, bias=True),
-                                     nn.RReLU())
+
+        self.mol_flat = nn.Sequential(
+            nn.Linear(args.hidden_size * args.extend_dim * 5, args.hidden_size * args.extend_dim, bias=True),
+            nn.RReLU())
+
+        self.mol_out = nn.Sequential(
+            nn.Linear(args.hidden_size * args.extend_dim, args.output_size, bias=True),
+            nn.RReLU())
+
+        self.reset_parameters()
+
+
+    def reset_parameters(self):
+        for layer in self.mol_lin:
+            if hasattr(layer, 'weight') and layer.weight is not None:
+                glorot_orthogonal(layer.weight, scale=2.0)
+
+            if hasattr(layer, 'bias') and layer.bias is not None:
+                layer.bias.data.fill_(0)
+
+        for sequential_layer in [self.mol_flat, self.mol_out]:
+            for layer in sequential_layer:
+                if hasattr(layer, 'reset_parameters'):
+                    layer.reset_parameters()
+
+                elif hasattr(layer, 'weight') and layer.weight is not None:
+                    glorot_orthogonal(layer.weight, scale=2.0)
+
+                if hasattr(layer, 'bias') and layer.bias is not None:
+                    layer.bias.data.fill_(0)
 
     def forward(self, dataset):
         x, edge_index, edge_attr, batch = dataset.x, dataset.edge_index, dataset.edge_attr, dataset.batch
@@ -52,15 +84,19 @@ class DMol_architecture(nn.Module):
     def __init__(self, args):
         super(DMol_architecture, self).__init__()
         self.message_steps = 3
-        self.mol1_lin0 = nn.Sequential(nn.Linear(args.node_size,
-                                                 args.node_size * args.extend_dim, bias=True),
-                                       nn.RReLU())
-        self.mol2_lin0 = nn.Sequential(nn.Linear(args.node_size,
-                                                 args.node_size * args.extend_dim, bias=True),
-                                       nn.RReLU())
 
-        exec('self.mol1_conv= {}(args.node_size, args.bond_size, args.extend_dim, args.dropout)'.format(args.model))
-        exec('self.mol2_conv= {}(args.node_size, args.bond_size, args.extend_dim, args.dropout)'.format(args.model))
+        self.mol1_lin0 = nn.Sequential(
+            nn.Linear(args.node_size, args.node_size * args.extend_dim, bias=True),
+            nn.RReLU())
+
+        self.mol2_lin0 = nn.Sequential(
+            nn.Linear(args.node_size,args.node_size * args.extend_dim, bias=True),
+            nn.RReLU())
+
+        self.mol1_conv = globals()[args.model](args.hidden_size, args.bond_size, args.extend_dim, args.dropout)
+
+        self.mol2_conv = globals()[args.model](args.hidden_size, args.bond_size, args.extend_dim, args.dropout)
+
         self.mol1_readout, self.mol2_readout = GlobalPool(args), GlobalPool(args)
 
         self.mol1_flat = nn.Linear(args.node_size * args.extend_dim * 5,
@@ -72,6 +108,36 @@ class DMol_architecture(nn.Module):
                                   args.hidden_size)
         self.lin_out2 = nn.Linear(args.hidden_size,
                                   args.output_size)
+
+        self.reset_parameters()
+
+    def reset_parameters(self):
+        for layer in self.mol1_lin0:
+            if hasattr(layer, 'weight'):
+                glorot_orthogonal(layer.weight, scale=2.0)
+            if hasattr(layer, 'bias'):
+                layer.bias.data.fill_(0)
+
+        for layer in self.mol2_lin0:
+            if hasattr(layer, 'weight'):
+                glorot_orthogonal(layer.weight, scale=2.0)
+            if hasattr(layer, 'bias'):
+                layer.bias.data.fill_(0)
+
+        if hasattr(self, 'mol1_conv') and hasattr(self.mol1_conv, 'reset_parameters'):
+            self.mol1_conv.reset_parameters()
+        if hasattr(self, 'mol2_conv') and hasattr(self.mol2_conv, 'reset_parameters'):
+            self.mol2_conv.reset_parameters()
+
+        glorot_orthogonal(self.mol1_flat.weight, scale=2.0)
+        self.mol1_flat.bias.data.fill_(0)
+        glorot_orthogonal(self.mol2_flat.weight, scale=2.0)
+        self.mol2_flat.bias.data.fill_(0)
+
+        glorot_orthogonal(self.lin_out1.weight, scale=2.0)
+        self.lin_out1.bias.data.fill_(0)
+        glorot_orthogonal(self.lin_out2.weight, scale=2.0)
+        self.lin_out2.bias.data.fill_(0)
 
     def forward(self, mol1, mol2):
         xm1 = self.mol1_lin0(mol1.x)
@@ -102,8 +168,11 @@ class GCN(nn.Module):
         super(GCN, self).__init__()
         self.gconv = gcnconv(node_size * extend_dim,
                              node_size * extend_dim)
-        self.norm_block = nn.Sequential(nn.LayerNorm(node_size * extend_dim),
-                                        nn.Dropout(p=dropout))
+
+        self.norm_block = nn.Sequential(
+            nn.LayerNorm(node_size * extend_dim),
+            nn.Dropout(p=dropout))
+
         self.act = nn.ReLU()
 
     def forward(self, x, edge_index, edge_attr, h, batch):
@@ -136,8 +205,11 @@ class GAT(nn.Module):
         super(GAT, self).__init__()
         self.gatconv = gatconv(node_size * extend_dim,
                                node_size * extend_dim)
-        self.norm_block = nn.Sequential(nn.LayerNorm(node_size * extend_dim),
-                                        nn.Dropout(p=dropout))
+
+        self.norm_block = nn.Sequential(
+            nn.LayerNorm(node_size * extend_dim),
+            nn.Dropout(p=dropout))
+
         self.act = nn.ReLU()
 
     def forward(self, x, edge_index, edge_attr, h, batch):
@@ -235,10 +307,14 @@ class MPNN(nn.Module):
         super(MPNN, self).__init__()
         self.gru = nn.GRU(node_size * extend_dim,
                           node_size * extend_dim)
-        self.norm_block = nn.Sequential(nn.LayerNorm(node_size * extend_dim),
-                                        nn.Dropout(p=dropout))
+
+        self.norm_block = nn.Sequential(
+            nn.LayerNorm(node_size * extend_dim),
+            nn.Dropout(p=dropout))
+
         self.conv = TripletMessage(node_size * extend_dim,
                                    bond_size)
+
         self.act = nn.ReLU()
 
     def forward(self, x, edge_index, edge_attr, h=None, batch=None):
@@ -283,7 +359,7 @@ class GlobalPool(torch.nn.Module):
 
     @property
     def name(self):
-        return 'globalpool'
+        return 'GlobalPool'
 
 
 class Set2set(nn.Module):
