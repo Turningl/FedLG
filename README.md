@@ -113,4 +113,4 @@ optional arguments:
 ```
 
 ## Acknowledgements
-Our implementation is based on [PFA](https://github.com/Turningl/PFA_pytorch) and [GLAM](https://github.com/yvquanli/GLAM), thanks a lot for their open source support.
+Our implementation is based on [GLAM](https://github.com/yvquanli/GLAM), thanks a lot for open source support.
