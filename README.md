@@ -64,7 +64,7 @@ optional arguments:
 
 ## Usage
 ```shell script
-CUDA_VISIBLE_DEVICES=${your_gpu_id} python main.py --save_dir 'result' --alg fedlg --model MPNN --split smi --global_round 100 --local_round 5  --root MoleculeNet --dataset tox21  -- split smi --seed 4567 
+CUDA_VISIBLE_DEVICES=${your_gpu_id} python main.py --save_dir 'results' --alg fedlg --model MPNN --split smi --global_round 100 --local_round 5  --root MoleculeNet --dataset tox21  -- split smi --seed 4567 
 ```
 All parameters of main:
 ```
