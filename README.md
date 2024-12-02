@@ -19,6 +19,7 @@ This is an implementation for Federated Learning Lanczos Graph (FedLG).
     - [CoCrystal](#cocrystal-httpsgithubcomsaoge123ccgnettreemaindata)
   - [Preprocess](#preprocess)
   - [Usage](#usage)
+  - [Bayesian optimization](#bayesian-optimization)
   - [Acknowledgements](#acknowledgements)
 
 
