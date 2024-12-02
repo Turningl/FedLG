@@ -12,14 +12,15 @@ This is an implementation for Federated Learning Lanczos Graph (FedLG).
   - [Table of Contents](#table-of-contents)
   - [Setup](#setup)
   - [Datasets](#datasets)
-    - [MoleculeNet](#moleculenet)
-    - [LITPCBA](#litpcba)
-    - [DrugBank](#drugbank)
-    - [BIOSNAP](#biosnap)
-    - [CoCrystal](#cocrystal)
+    - [MoleculeNet](#moleculenet-httpsmoleculenetorgdatasets-1)
+    - [LITPCBA](#litpcba-httpsgithubcomidruglabfp-gnnblobmaindatarar)
+    - [DrugBank](#drugbank-httpsgithubcomkexinhuang12345castertreemasterddedata)
+    - [BIOSNAP](#biosnap-httpsgithubcomkexinhuang12345castertreemasterddedata)
+    - [CoCrystal](#cocrystal-httpsgithubcomsaoge123ccgnettreemaindata)
   - [Preprocess](#preprocess)
   - [Usage](#usage)
   - [Acknowledgements](#acknowledgements)
+
 
 
 ## Setup
@@ -33,15 +34,15 @@ We use CUDA Version 11.6. If you have a different version of CUDA, please ensure
 ## Datasets
 Download data to the `FedLG/dataset` folder.
 
-MoleculeNet: https://moleculenet.org/datasets-1.
+#### MoleculeNet: https://moleculenet.org/datasets-1.
 
-LITPCBA: https://github.com/idrugLab/FP-GNN/blob/main/Data.rar.
+#### LITPCBA: https://github.com/idrugLab/FP-GNN/blob/main/Data.rar.
 
-DrugBank: https://github.com/kexinhuang12345/CASTER/tree/master/DDE/data.
+#### DrugBank: https://github.com/kexinhuang12345/CASTER/tree/master/DDE/data.
 
-BIOSNAP: https://github.com/kexinhuang12345/CASTER/tree/master/DDE/data.
+#### BIOSNAP: https://github.com/kexinhuang12345/CASTER/tree/master/DDE/data.
 
-CoCrystal: https://github.com/Saoge123/ccgnet/tree/main/data.
+#### CoCrystal: https://github.com/Saoge123/ccgnet/tree/main/data.
 
 ## Preprocess
 If run the `main.py` directly, it may take a long time to preprocess dataset, so first run:
@@ -112,5 +113,10 @@ optional arguments:
   --clip                clip value for local differently privacy
 ```
 
+## Bayesian optimization
+```shell script
+CUDA_VISIBLE_DEVICES=${your_gpu_id} python main.py --save_dir 'results' --comm_optimization True --alg fedlg --model MPNN --split smi --global_round 100 --local_round 5  --root MoleculeNet --dataset tox21  -- split smi --seed 4567 
+```
+
 ## Acknowledgements
-Our implementation is based on [GLAM](https://github.com/yvquanli/GLAM), thanks a lot for open source support.
+Our implementation is based on [PFA](https://github.com/Turningl/PFA_pytorch) and [GLAM](https://github.com/yvquanli/GLAM), thanks a lot for their open source support.
