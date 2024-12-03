@@ -55,17 +55,17 @@ All parameters of dataloader:
 usage: dataloader.py [--root] [--dataset] [--split] [--seed] [--device]
 
 optional arguments:
-  --root             root directory for differernt molecular discovery databases: 
+  --root           --root directory for differernt molecular discovery databases: 
                      MoleculeNet, DrugBank, BIOSNAP, LITPCBA, CoCrystal
 
-  --dataset          In different root directory, choose dataset of different databases
+  --dataset        --In different root directory, choose dataset of different databases
 
-  --split            split type for different root and dataset:
+  --split          --split type for different root and dataset:
                      smi, smi1, smi2
 
-  --seed             fixed data initialization and training seeds
+  --seed           --fixed data initialization and training seeds
 
-  --device           cuda or cpu
+  --device         --cuda or cpu
 ```
 
 ## Usage
@@ -78,76 +78,76 @@ usage: main.py [--alg] [--root] [--dataset] [--node_size] [--bond_size] [--hidde
                [--weight_decay] [--eps] [constant] [--delta] [--dp] [--batch_size] [--device] [--save_dir] [--beta1] [--beta2] [--local_round] [--proj_dims] [--lanczos_iter] [--global_round] [--comm_optimization] [--lr] [--clip]
 
 optional arguments:
-  --alg                 federated learning algorithm:
+  --alg               --federated learning algorithm:
                         fedavg, fedprox, fedsgd, fedlg, fedadam, fedchem
 
-  --root                root directory for differernt molecular discovery databases: 
+  --root              --root directory for differernt molecular discovery databases: 
                         MoleculeNet, DrugBank, BIOSNAP, LITPCBA, CoCrystal
 
-  --dataset             In different root directory, choose dataset of different databases
+  --dataset           --In different root directory, choose dataset of different databases
 
-  --node_size           molecular node size
+  --node_size         --molecular node size
 
-  --bond_size           molecular bond size
+  --bond_size         --molecular bond size
 
   --hidden_size         hidden size
 
-  --extend_dim          extend dim for neural network
+  --extend_dim        --extend dim for neural network
 
-  --output_size         output size
+  --output_size       --output size
 
-  --model               graph neural network:
+  --model             --graph neural network:
                         MPNN, GCN, GAT
 
-  --split               split type for different root and dataset:
+  --split             --split type for different root and dataset:
                         smi, smi1, smi2
 
-  --drooput             dropout rate
+  --drooput           --dropout rate
 
-  --message steps       message step for graph neural network
+  --message steps     --message step for graph neural network
 
-  --num_clients         clients number, here we set the max clients number is up to 4
+  --num_clients       --clients number, here we set the max clients number is up to 4
 
-  --alpha               alpha for molecule dirichlet distribution
+  --alpha             --alpha for molecule dirichlet distribution
 
-  --null_value          null value
+  --null_value        --null value
 
-  --seed                fixed data initialization and training seed
+  --seed              --fixed data initialization and training seed
 
-  --weight_decay        weight decay for optimizer
+  --weight_decay      --weight decay for optimizer
 
-  --eps                 epsilons distribution
+  --eps               --epsilons distribution
 
-  --constant            constant for local differently privacy
+  --constant          --constant for local differently privacy
 
-  --delta               differential privacy parameter
+  --delta             --differential privacy parameter
 
-  --dp                  if True, use differential privacy
+  --dp                --if True, use differential privacy
 
-  --batch_size          batch size of the model training:
+  --batch_size        --batch size of the model training:
                         32, 64 or 128
 
-  --device              cuda or cpu
+  --device            --cuda or cpu
 
-  --save_dir            results save directory, the model test results is saved to ./results/
+  --save_dir          --results save directory, the model test results is saved to ./results/
 
-  --beta1               beta1 for Adam optimizer
+  --beta1             --beta1 for Adam optimizer
 
-  --beta2               beta2 for Adam optimizer
+  --beta2             --beta2 for Adam optimizer
 
-  --local_round         local model training round
+  --local_round       --local model training round
 
-  --proj_dims           project dim of lanczos algorithm
+  --proj_dims         --project dim of lanczos algorithm
 
-  --lanczos_iter        the iterations of lanczos
+  --lanczos_iter      --the iterations of lanczos
 
-  --global_round        global model training round
+  --global_round      --global model training round
 
-  --comm_optimization   using Bayesian Optimization or not
+  --comm_optimization --using Bayesian Optimization or not
 
-  --lr                  the learning rate of graph model
+  --lr                --the learning rate of graph model
 
-  --clip                clip value for local differently privacy
+  --clip              --clip value for local differently privacy
 ```
 
 ## Bayesian optimization
