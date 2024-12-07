@@ -1,7 +1,5 @@
 # A federated graph learning method to multi-party collaboration for molecular discovery
-<p align="center">
-  <img src="img/Fig. 1.png" /> 
-</p>
+
 This is an implementation for Federated Learning Lanczos Graph (FedLG).
 
 
