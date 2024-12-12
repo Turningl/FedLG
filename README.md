@@ -17,7 +17,6 @@ This is an implementation for Federated Lanczos Graph (FedLG).
     - [CoCrystal](#cocrystal-httpsgithubcomsaoge123ccgnettreemaindata)
   - [Preprocess](#preprocess)
   - [Usage](#usage)
-  - [Bayesian optimization](#bayesian-optimization)
 
 ## Setup
 
@@ -143,9 +142,4 @@ optional arguments:
   --lr                --the learning rate of graph model
 
   --clip              --clip value for local differently privacy
-```
-
-## Bayesian optimization
-```shell script
-CUDA_VISIBLE_DEVICES=${your_gpu_id} python main.py --save_dir 'results' --comm_optimization True --alg fedlg --model MPNN --split smi --global_round 100 --local_round 5  --root MoleculeNet --dataset tox21  -- split smi --seed 4567 
 ```
