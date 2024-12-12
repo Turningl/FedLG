@@ -18,9 +18,6 @@ This is an implementation for Federated Lanczos Graph (FedLG).
   - [Preprocess](#preprocess)
   - [Usage](#usage)
   - [Bayesian optimization](#bayesian-optimization)
-  - [Acknowledgements](#acknowledgements)
-
-
 
 ## Setup
 
@@ -152,6 +149,3 @@ optional arguments:
 ```shell script
 CUDA_VISIBLE_DEVICES=${your_gpu_id} python main.py --save_dir 'results' --comm_optimization True --alg fedlg --model MPNN --split smi --global_round 100 --local_round 5  --root MoleculeNet --dataset tox21  -- split smi --seed 4567 
 ```
-
-## Acknowledgements
-Our implementation is based on [PFA](https://github.com/Turningl/PFA_pytorch) and [GLAM](https://github.com/yvquanli/GLAM), thanks a lot for their open source support.
