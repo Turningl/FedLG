@@ -6,17 +6,16 @@ This is an implementation for Federated Lanczos Graph (FedLG).
 
 ## Table of Contents
 
-- [FedLG](#fedlg)
-  - [Table of Contents](#table-of-contents)
-  - [Setup](#setup)
-  - [Datasets](#datasets)
-    - [MoleculeNet](#moleculenet-httpsmoleculenetorgdatasets-1)
-    - [LITPCBA](#litpcba-httpsgithubcomidruglabfp-gnnblobmaindatarar)
-    - [DrugBank](#drugbank-httpsgithubcomkexinhuang12345castertreemasterddedata)
-    - [BIOSNAP](#biosnap-httpsgithubcomkexinhuang12345castertreemasterddedata)
-    - [CoCrystal](#cocrystal-httpsgithubcomsaoge123ccgnettreemaindata)
-  - [Preprocess](#preprocess)
-  - [Usage](#usage)
+- [Table of Contents](#table-of-contents)
+- [Setup](#setup)
+- [Datasets](#datasets)
+  - [MoleculeNet](#moleculenet-httpsmoleculenetorgdatasets-1)
+  - [LITPCBA](#litpcba-httpsgithubcomidruglabfp-gnnblobmaindatarar)
+  - [DrugBank](#drugbank-httpsgithubcomkexinhuang12345castertreemasterddedata)
+  - [BIOSNAP](#biosnap-httpsgithubcomkexinhuang12345castertreemasterddedata)
+  - [CoCrystal](#cocrystal-httpsgithubcomsaoge123ccgnettreemaindata)
+- [Preprocess](#preprocess)
+- [Usage](#usage)
 
 ## Setup
 
