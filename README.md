@@ -51,7 +51,12 @@ optional arguments:
   --root           --root directory for differernt molecular discovery databases: 
                      MoleculeNet, DrugBank, BIOSNAP, LITPCBA, CoCrystal
 
-  --dataset        --In different root directory, choose dataset of different databases
+  --dataset        --In different root directory, choose dataset of different databases:
+                     MoleculeNet: bbbp, MoleculeNet: bace, MoleculeNet: sider, MoleculeNet: tox21,
+                     MoleculeNet: toxcast, MoleculeNet: esol, MoleculeNet: lipo, MoleculeNet: freesolv,
+                     LIT-PCBA: ALDH1, LIT-PCBA: FEN1, LIT-PCBA: GBA, LIT-PCBA: KAT2A,
+                     LIT-PCBA: MAPK1, LIT-PCBA: PKM2, LIT-PCBA: VDR,
+                     DrugBank: DrugBank, CoCrystal: CoCrystal, BIOSNAP: BIOSNAP
 
   --split          --split type for different root and dataset:
                      smi, smi1, smi2
@@ -77,7 +82,12 @@ optional arguments:
   --root              --root directory for differernt molecular discovery databases: 
                         MoleculeNet, DrugBank, BIOSNAP, LITPCBA, CoCrystal
 
-  --dataset           --In different root directory, choose dataset of different databases
+  --dataset           --In different root directory, choose dataset of different databases:
+                        MoleculeNet: bbbp, MoleculeNet: bace, MoleculeNet: sider, MoleculeNet: tox21,
+                        MoleculeNet: toxcast, MoleculeNet: esol, MoleculeNet: lipo, MoleculeNet: freesolv,
+                        LIT-PCBA: ALDH1, LIT-PCBA: FEN1, LIT-PCBA: GBA, LIT-PCBA: KAT2A,
+                        LIT-PCBA: MAPK1, LIT-PCBA: PKM2, LIT-PCBA: VDR,
+                        DrugBank: DrugBank, CoCrystal: CoCrystal, BIOSNAP: BIOSNAP
 
   --node_size         --molecular node size
 
