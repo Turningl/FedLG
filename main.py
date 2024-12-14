@@ -132,7 +132,7 @@ if __name__ == '__main__':
     parser.add_argument('--root', type=str,
                         choices=['MoleculeNet, DrugBank, BIOSNAP, LITPCBA, CoCrystal'], default='MoleculeNet',
                         help='choose the dataset, start with the path to dataset dir.')
-    parser.add_argument('--dataset', type=str, default='bace',
+    parser.add_argument('--dataset', type=str,
                         choices=['MoleculeNet: bbbp', 'MoleculeNet: bace', 'MoleculeNet: sider', 'MoleculeNet: tox21',
                                  'MoleculeNet: toxcast','MoleculeNet: esol', 'MoleculeNet: lipo', 'MoleculeNet: freesolv',
                                  'LIT-PCBA: ALDH1', 'LIT-PCBA: FEN1', 'LIT-PCBA: GBA', 'LIT-PCBA: KAT2A',
@@ -149,9 +149,9 @@ if __name__ == '__main__':
     parser.add_argument('--extend_dim', default=4, type=float)
     parser.add_argument('--output_size', default=1, type=int,
                         help='initial output size.')
-    parser.add_argument('--model', default='MPNN', type=str, choices=['MPNN, GCN, GAT'],
+    parser.add_argument('--model', type=str, choices=['MPNN, GCN, GAT'],
                         help='Graph model algorithm of MPNN, GCN and GAT.')
-    parser.add_argument('--split', default='smi', type=str, choices=['smi, smi1, smi2, random'],
+    parser.add_argument('--split', type=str, choices=['smi, smi1, smi2, random'],
                         help='Choose a data splitting method.')
     parser.add_argument('--dropout', default=0.1, type=float)
     parser.add_argument('--message_steps', default=3, type=int)
@@ -159,11 +159,11 @@ if __name__ == '__main__':
     parser.add_argument('--num_clients', default=4, type=int)
     parser.add_argument('--alpha', default=0.1, type=float)
     parser.add_argument('--null_value', default=-1, type=float)
-    parser.add_argument('--seed', default=1234, type=int, choices=[1234, 4567, 7890],
+    parser.add_argument('--seed', type=int, choices=[1234, 4567, 7890],
                         help='Initialize random number seeds for model training and data splitting.')
     parser.add_argument('--weight_decay', default=1e-5, type=float)
 
-    parser.add_argument('--comm_optimization', default=False, type=bool,
+    parser.add_argument('--comm_optimization', type=bool,
                         help='communication optimization')
     parser.add_argument('--eps', type=str, default='mixgauss1',
                         help='epsilon file name')
@@ -194,8 +194,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--init', default=10, type=int, help='the count of initial random points')
     parser.add_argument('--max_step', default=100, type=int, help='the maximum steps for Bayesian optimization')
-    # parser.add_argument('--anti_noise', default=0, type=float, help='0.1, 0.15, 0.2')
-
+    
     args = parser.parse_args()
     os.environ["CUDA_VISIBLE_DEVICES"] = '0'
 
@@ -215,4 +214,3 @@ if __name__ == '__main__':
     # accountants = []
     architecture = Mol_architecture(args) if args.root in ['MoleculeNet', 'LITPCBA'] else DMol_architecture(args)
     main(args, dataset, architecture)
-
