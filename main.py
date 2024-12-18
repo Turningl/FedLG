@@ -94,7 +94,7 @@ def main(args, dataset, model):
         if args.comm_optimization:
             model_states, means = server.fetch_comm_optimization()
 
-        # =============================== regression
+        # =============================== regression ===============================
         if dataset.dataset_name in dataset.dataset_names['regression']:
             test_rmse, test_loss = inference_test_regression(args, global_model, test)
             print('current global model has test rmse: %.4f  test loss: %.4f' % (test_rmse, test_loss))
@@ -113,7 +113,7 @@ def main(args, dataset, model):
 
         # torch.save(accuracy_accountant, 'accuracy_accountant.pt')
 
-    # =============================== print and save ===============================
+    # =============================== print and save progress ===============================
     if rmse_accoutant:
         optimal_result = print_rmse_accoutant(rmse_accoutant)
         save_progress(args, rmse_accoutant, optimal_result)
