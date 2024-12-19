@@ -126,7 +126,7 @@ def main(args, dataset, model):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Federated Learning Lanczos Graph')
+    parser = argparse.ArgumentParser(description='Federated Lanczos Graph')
     parser.add_argument('--alg', type=str,
                         choices=['FedAvg, FedProx, FedSGD, FedLG, FedAdam, FLIT'], default='FedAdam',
                         help='algorithm options, start with the choosed algorithm.')
