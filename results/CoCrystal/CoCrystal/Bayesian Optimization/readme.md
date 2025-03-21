@@ -1,3 +1,3 @@
 save results dir
 
-CoCrystal/CoCrystal/Bayesian Optimization are Bayesian optimization results.
+CoCrystal/CoCrystal/Bayesian Optimization is Bayesian optimization results.
