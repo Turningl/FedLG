@@ -23,7 +23,7 @@ To install the conda virtual environment `FedLG`:
 ```shell script
 $ bash setup.sh
 ```
-We use CUDA Version 11.6. If you have a different version of CUDA, please ensure that you install the appropriate versions of PyTorch and the CUDA toolkit that are compatible with your CUDA setup. Additionally, make sure that the versions of PyTorch and PyTorch Geometric are mutually compatible. For a straightforward installation of PyTorch Geometric, refer to the [official installation guide](https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html#).
+We use CUDA Version 11.7. If you have a different version of CUDA, please ensure that you install the appropriate versions of PyTorch and the CUDA toolkit that are compatible with your CUDA setup. Additionally, make sure that the versions of PyTorch and PyTorch Geometric are mutually compatible. For a straightforward installation of PyTorch Geometric, refer to the [official installation guide](https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html#).
 
 ## Datasets
 Download data to the `FedLG/dataset` folder.
