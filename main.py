@@ -128,12 +128,12 @@ def main(args, dataset, model):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Federated Lanczos Graph')
     parser.add_argument('--alg', type=str,
-                        choices=['FedAvg, FedProx, FedSGD, FedLG, FedAdam, FLIT'], default='FedAdam',
+                        choices=['AdaFedSemi, FedAvg, FedDF, FedProx, FedSGD, FedLG, FedAdam, FLIT, SelectiveFD'], default='SelectiveFD',
                         help='algorithm options, start with the choosed algorithm.')
     parser.add_argument('--root', type=str,
-                        choices=['MoleculeNet, DrugBank, BIOSNAP, LITPCBA, CoCrystal'], default='MoleculeNet',
+                        choices=['MoleculeNet, DrugBank, BIOSNAP, LITPCBA, CoCrystal'], default='CoCrystal',
                         help='choose the dataset, start with the path to dataset dir.')
-    parser.add_argument('--dataset', type=str,
+    parser.add_argument('--dataset', type=str, default='CoCrystal',
                         choices=['MoleculeNet: bbbp', 'MoleculeNet: bace', 'MoleculeNet: sider', 'MoleculeNet: tox21',
                                  'MoleculeNet: toxcast','MoleculeNet: esol', 'MoleculeNet: lipo', 'MoleculeNet: freesolv',
                                  'LIT-PCBA: ALDH1', 'LIT-PCBA: FEN1', 'LIT-PCBA: GBA', 'LIT-PCBA: KAT2A',
@@ -150,9 +150,9 @@ if __name__ == '__main__':
     parser.add_argument('--extend_dim', default=4, type=float)
     parser.add_argument('--output_size', default=1, type=int,
                         help='initial output size.')
-    parser.add_argument('--model', type=str, choices=['MPNN, GCN, GAT'],
+    parser.add_argument('--model', type=str, choices=['MPNN, GCN, GAT'], default='MPNN',
                         help='Graph model algorithm of MPNN, GCN and GAT.')
-    parser.add_argument('--split', type=str, choices=['smi, smi1, smi2, random'],
+    parser.add_argument('--split', type=str, choices=['smi, smi1, smi2, random'], default='smi1',
                         help='Choose a data splitting method.')
     parser.add_argument('--dropout', default=0.1, type=float)
     parser.add_argument('--message_steps', default=3, type=int)
@@ -160,11 +160,11 @@ if __name__ == '__main__':
     parser.add_argument('--num_clients', default=4, type=int)
     parser.add_argument('--alpha', default=0.1, type=float)
     parser.add_argument('--null_value', default=-1, type=float)
-    parser.add_argument('--seed', type=int, choices=[1234, 4567, 7890],
+    parser.add_argument('--seed', type=int, choices=[1234, 4567, 7890], default=1234,
                         help='Initialize random number seeds for model training and data splitting.')
     parser.add_argument('--weight_decay', default=1e-5, type=float)
 
-    parser.add_argument('--comm_optimization', type=bool,
+    parser.add_argument('--comm_optimization', type=bool, default=False,
                         help='communication optimization')
     parser.add_argument('--eps', type=str, default='mixgauss1',
                         help='epsilon file name')
@@ -176,7 +176,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--batch_size', default=32, type=int,
                         choices=[32, 64, 128])
-    parser.add_argument('--device', default='cuda', type=str,
+    parser.add_argument('--device', default='cuda:2', type=str,
                         choices=['cuda', 'cpu'])
     parser.add_argument('--save_dir', default='results', type=str)
 
@@ -193,25 +193,36 @@ if __name__ == '__main__':
     parser.add_argument('--clip', default=0.5, type=float,
                         choices=[1.0, 1.5, 2.0])
 
+    parser.add_argument('--max_participation', default=1.0, type=float)
+    parser.add_argument('--min_participation', default=0.1, type=float)
+    parser.add_argument('--max_confidence', default=0.99, type=float)
+    parser.add_argument('--min_confidence', default=0.8, type=float)
+
     parser.add_argument('--init', default=10, type=int, help='the count of initial random points')
     parser.add_argument('--max_step', default=100, type=int, help='the maximum steps for Bayesian optimization')
     
     args = parser.parse_args()
-    os.environ["CUDA_VISIBLE_DEVICES"] = '0'
+    # os.environ["CUDA_VISIBLE_DEVICES"] = '0'
 
-    # args.seed = seed
-    exec("dataset = {}Dataset('./dataset/{}', '{}', '{}', {})".format(args.root, args.root, args.dataset, args.split, args.seed))
-    # dataset = MolDataset(root='../dataset/' + args.root, name=args.dataset, split_seed=args.seed)
-    print(dataset)
-    print()
-    print('the dataset name: {}, the mol size: {}.\n'.format(args.dataset, len(dataset)))
+    acces = []
+    for seed in [1234, 4567, 7890]:
+        args.seed = seed
+        exec("dataset = {}Dataset('./dataset/{}', '{}', '{}', {})".format(args.root, args.root, args.dataset, args.split, args.seed))
+        # dataset = MolDataset(root='../dataset/' + args.root, name=args.dataset, split_seed=args.seed)
+        print(dataset)
+        print()
+        print('the dataset name: {}, the mol size: {}.\n'.format(args.dataset, len(dataset)))
 
-    args.num_clients = 3 if len(dataset) <= 2000 else 4
-    args.node_size, args.bond_size = dataset.node_features, dataset.edge_features
-    args.output_size = dataset.num_tasks
-    print(args)
-    print()
+        args.num_clients = 3 if len(dataset) <= 2000 else 4
+        args.node_size, args.bond_size = dataset.node_features, dataset.edge_features
+        args.output_size = dataset.num_tasks
+        print(args)
+        print()
 
-    # accountants = []
-    architecture = Mol_architecture(args) if args.root in ['MoleculeNet', 'LITPCBA'] else DMol_architecture(args)
-    main(args, dataset, architecture)
+        # accountants = []
+        architecture = Mol_architecture(args) if args.root in ['MoleculeNet', 'LITPCBA'] else DMol_architecture(args)
+        acc = main(args, dataset, architecture)
+
+        acces.append(acc)
+
+    print(np.mean(acces), np.std(acces))
