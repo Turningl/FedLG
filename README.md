@@ -155,7 +155,7 @@ optional arguments:
 
 ## License
 
-FedLG is released under the [MIT](LICENSE.txt) license.
+FedLG is released under the [MIT](LICENSE) license.
 
 ## Contact
 
