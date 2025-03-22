@@ -152,3 +152,11 @@ optional arguments:
 
   --clip              --clip value for local differently privacy
 ```
+
+## License
+
+FedLG is released under the [MIT](LICENSE.txt) license.
+
+## Contact
+
+If you have any questions, please reach out to zl16035056@gmail.com
