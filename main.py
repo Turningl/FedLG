@@ -204,25 +204,18 @@ if __name__ == '__main__':
     args = parser.parse_args()
     # os.environ["CUDA_VISIBLE_DEVICES"] = '0'
 
-    acces = []
-    for seed in [1234, 4567, 7890]:
-        args.seed = seed
-        exec("dataset = {}Dataset('./dataset/{}', '{}', '{}', {})".format(args.root, args.root, args.dataset, args.split, args.seed))
-        # dataset = MolDataset(root='../dataset/' + args.root, name=args.dataset, split_seed=args.seed)
-        print(dataset)
-        print()
-        print('the dataset name: {}, the mol size: {}.\n'.format(args.dataset, len(dataset)))
+    exec("dataset = {}Dataset('./dataset/{}', '{}', '{}', {})".format(args.root, args.root, args.dataset, args.split, args.seed))
+    # dataset = MolDataset(root='../dataset/' + args.root, name=args.dataset, split_seed=args.seed)
+    print(dataset)
+    print()
+    print('the dataset name: {}, the mol size: {}.\n'.format(args.dataset, len(dataset)))
 
-        args.num_clients = 3 if len(dataset) <= 2000 else 4
-        args.node_size, args.bond_size = dataset.node_features, dataset.edge_features
-        args.output_size = dataset.num_tasks
-        print(args)
-        print()
+    args.num_clients = 3 if len(dataset) <= 2000 else 4
+    args.node_size, args.bond_size = dataset.node_features, dataset.edge_features
+    args.output_size = dataset.num_tasks
+    print(args)
+    print()
 
-        # accountants = []
-        architecture = Mol_architecture(args) if args.root in ['MoleculeNet', 'LITPCBA'] else DMol_architecture(args)
-        acc = main(args, dataset, architecture)
-
-        acces.append(acc)
-
-    print(np.mean(acces), np.std(acces))
+    # accountants = []
+    architecture = Mol_architecture(args) if args.root in ['MoleculeNet', 'LITPCBA'] else DMol_architecture(args)
+    main(args, dataset, architecture)
