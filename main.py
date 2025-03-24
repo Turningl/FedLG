@@ -128,12 +128,12 @@ def main(args, dataset, model):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Federated Lanczos Graph')
     parser.add_argument('--alg', type=str,
-                        choices=['AdaFedSemi, FedAvg, FedDF, FedProx, FedSGD, FedLG, FedAdam, FLIT, SelectiveFD'], default='SelectiveFD',
+                        choices=['AdaFedSemi, FedAvg, FedDF, FedProx, FedSGD, FedLG, FedAdam, FLIT, SelectiveFD'],
                         help='algorithm options, start with the choosed algorithm.')
     parser.add_argument('--root', type=str,
-                        choices=['MoleculeNet, DrugBank, BIOSNAP, LITPCBA, CoCrystal'], default='CoCrystal',
+                        choices=['MoleculeNet, DrugBank, BIOSNAP, LITPCBA, CoCrystal'],
                         help='choose the dataset, start with the path to dataset dir.')
-    parser.add_argument('--dataset', type=str, default='CoCrystal',
+    parser.add_argument('--dataset', type=str, 
                         choices=['MoleculeNet: bbbp', 'MoleculeNet: bace', 'MoleculeNet: sider', 'MoleculeNet: tox21',
                                  'MoleculeNet: toxcast','MoleculeNet: esol', 'MoleculeNet: lipo', 'MoleculeNet: freesolv',
                                  'LIT-PCBA: ALDH1', 'LIT-PCBA: FEN1', 'LIT-PCBA: GBA', 'LIT-PCBA: KAT2A',
@@ -150,9 +150,9 @@ if __name__ == '__main__':
     parser.add_argument('--extend_dim', default=4, type=float)
     parser.add_argument('--output_size', default=1, type=int,
                         help='initial output size.')
-    parser.add_argument('--model', type=str, choices=['MPNN, GCN, GAT'], default='MPNN',
+    parser.add_argument('--model', type=str, choices=['MPNN, GCN, GAT'], 
                         help='Graph model algorithm of MPNN, GCN and GAT.')
-    parser.add_argument('--split', type=str, choices=['smi, smi1, smi2, random'], default='smi1',
+    parser.add_argument('--split', type=str, choices=['smi, smi1, smi2, random'], default='smi',
                         help='Choose a data splitting method.')
     parser.add_argument('--dropout', default=0.1, type=float)
     parser.add_argument('--message_steps', default=3, type=int)
@@ -176,7 +176,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--batch_size', default=32, type=int,
                         choices=[32, 64, 128])
-    parser.add_argument('--device', default='cuda:2', type=str,
+    parser.add_argument('--device', default='cuda', type=str,
                         choices=['cuda', 'cpu'])
     parser.add_argument('--save_dir', default='results', type=str)
 
