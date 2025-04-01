@@ -1,7 +1,5 @@
 # A federated graph learning method to multi-party collaboration for molecular discovery
 
-![FedLG](https://github.com/Turningl/FedLG/blob/main/assert/Fig.%201.png)
-
 This is an implementation for Federated Lanczos Graph (FedLG).
 
 
@@ -41,8 +39,6 @@ Download data to the `FedLG/dataset` folder.
 #### CoCrystal: https://github.com/Saoge123/ccgnet/tree/main/data.
 
 ## Preprocess
-
-![Preprocess](https://github.com/Turningl/FedLG/blob/main/assert/Extended%20Data%20Fig.%201.png)
 
 If run the `main.py` directly, it may take a long time to preprocess dataset, so first run:
 ```shell script
