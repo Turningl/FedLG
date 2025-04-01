@@ -41,6 +41,9 @@ Download data to the `FedLG/dataset` folder.
 #### CoCrystal: https://github.com/Saoge123/ccgnet/tree/main/data.
 
 ## Preprocess
+
+![Preprocess](https://github.com/Turningl/FedLG/blob/main/assert/Extended%20Data%20Fig.%201.png)
+
 If run the `main.py` directly, it may take a long time to preprocess dataset, so first run:
 ```shell script
 python dataloaer.py --root MoleculeNet --dataset tox21 -- split smi --seed 4567
