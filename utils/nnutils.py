@@ -245,8 +245,6 @@ class KuLSIF_density_ratio_estimation:
         torch.save(param_dict, path)
 
 
-
-
 class KuLSIF_estimator(KuLSIF_density_ratio_estimation):
     def __init__(self,
                  Gaussian_kernel_width,
