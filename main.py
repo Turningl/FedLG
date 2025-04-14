@@ -160,7 +160,7 @@ if __name__ == '__main__':
     parser.add_argument('--num_clients', default=4, type=int)
     parser.add_argument('--alpha', default=0.1, type=float)
     parser.add_argument('--null_value', default=-1, type=float)
-    parser.add_argument('--seed', type=int, choices=[1234, 4567, 7890], default=1234,
+    parser.add_argument('--seed', type=int, choices=[1234, 4567, 7890],
                         help='Initialize random number seeds for model training and data splitting.')
     parser.add_argument('--weight_decay', default=1e-5, type=float)
 
