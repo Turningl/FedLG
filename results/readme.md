@@ -1,1 +1,1 @@
-save results dir
+Save the FedLG/results folder.
