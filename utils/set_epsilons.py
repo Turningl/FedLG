@@ -6,47 +6,67 @@ import configparser
 import numpy as np
 
 def set_epsilons_from_distributions(args, N):
-    np.random.seed(args.seed + 1)
-    public_num, private_num = 1, N - 1
+    """
+    Args:
+        args (object): Configuration arguments.
+        N (int): Total number of clients.
+
+    Returns:
+        numpy.ndarray: Array of epsilon values for each client.
+    """
+    np.random.seed(args.seed + 1)  # Set the random seed for reproducibility.
+    public_num, private_num = 1, N - 1  # Define the number of public and private clients.
     print('Set epsilons')
 
+    # Read the configuration file for epsilon distributions.
     config = configparser.RawConfigParser()
     config.read('./parameters/{}.in'.format(args.eps))
 
-    # Parse distributions
+    # Parse the distributions from the configuration file.
     dists = []
-    for section in config.sections()[:2]:
-        mean = float(config.get(section, 'mean'))
-        std = float(config.get(section, 'std'))
-        dist = {'mean': mean, 'std': std}
+    for section in config.sections()[:2]:  # Consider only the first two sections.
+        mean = float(config.get(section, 'mean'))  # Get the mean of the distribution.
+        std = float(config.get(section, 'std'))  # Get the standard deviation of the distribution.
+        dist = {'mean': mean, 'std': std}  # Store the distribution parameters.
         dists.append(dist)
 
-    # Generate samples from the distributions
-    samples1 = np.random.normal(loc=dists[0]['mean'],
+    # Generate samples from the distributions.
+    samples1 = np.random.normal(loc=dists[0]['mean'],  # Generate samples for private clients.
                                 scale=dists[0]['std'],
                                 size=private_num).tolist()
 
-    samples2 = np.random.normal(loc=dists[1]['mean'],
+    samples2 = np.random.normal(loc=dists[1]['mean'],  # Generate samples for public clients.
                                 scale=dists[1]['std'],
                                 size=public_num).tolist()
 
-    epsilons = np.concatenate([samples1, samples2])
+    epsilons = np.concatenate([samples1, samples2])  # Combine the samples into a single array.
 
-    # Optionally parse 'prob' and 'threshold' sections if needed
+    # Optionally parse 'prob' and 'threshold' sections if needed.
     # prob = [float(p) for p in config.get('prob', 'a').splitlines() if p.strip()]
-    #threshold = [float(t) for t in config.get('threshold', 'threshold').splitlines() if t.strip()]
+    # threshold = [float(t) for t in config.get('threshold', 'threshold').splitlines() if t.strip()]
 
     # print("Probabilities:", prob)
     # print("Thresholds:", threshold)
 
-    # np.random.shuffle(epsilons)
+    # np.random.shuffle(epsilons)  # Shuffle the epsilon values to ensure randomness.
     return epsilons
 
+
 def prepare_local_differential_privacy(args, num_clients):
-    epsilons = None
-    if args.dp:
-        epsilons = set_epsilons_from_distributions(args, num_clients)
-    return epsilons
+    """
+    Prepare epsilon values for local differential privacy.
+
+    Args:
+        args (object): Configuration arguments.
+        num_clients (int): Total number of clients.
+
+    Returns:
+        numpy.ndarray or None: Array of epsilon values for each client if differential privacy is enabled, otherwise None.
+    """
+    epsilons = None  # Initialize epsilon values to None.
+    if args.dp:  # Check if differential privacy is enabled.
+        epsilons = set_epsilons_from_distributions(args, num_clients)  # Generate epsilon values.
+    return epsilons  # Return the epsilon values or None.
 
 
 # if __name__ == '__main__':
