@@ -17,85 +17,107 @@ from utils.chemutils import extract_batch_data
 
 @torch.no_grad()
 def inference_test_classification(args, model, test):
-    model.eval().to(args.device)
-    test_dataset = DataLoader(test, batch_size=args.batch_size, shuffle=True)
+    """
+    Evaluate the performance of a model on a test dataset for a classification task.
 
-    criterion = nn.BCEWithLogitsLoss()
+    Args:
+        args (object): Configuration arguments.
+        model (torch.nn.Module): The trained model.
+        test (torch.utils.data.Dataset): The test dataset.
 
+    Returns:
+        tuple: A tuple containing the mean test accuracy and mean test loss.
+    """
+    model.eval().to(args.device)  # Set the model to evaluation mode and move it to the specified device.
+    test_dataset = DataLoader(test, batch_size=args.batch_size, shuffle=True)  # Create a DataLoader for the test dataset.
+
+    criterion = nn.BCEWithLogitsLoss()  # Define the loss criterion for binary classification.
     test_loss = []
     test_acc = []
 
     print(' ')
     for step, test_batch in tqdm(enumerate(test_dataset), total=len(test_dataset)):
         if test.related_title in ['DrugBank', 'BIOSNAP', 'CoCrystal']:
+            # Extract batch data for datasets with two molecules.
             mol1_test, mol2_test = extract_batch_data(test_dataset.dataset.mol_dataset, test_batch)
             mol1_test, mol2_test, y_test = mol1_test.to(args.device), mol2_test.to(
                 args.device), test_batch.y.to(args.device)
-            y_pred = model(mol1_test, mol2_test)
+            y_pred = model(mol1_test, mol2_test)  # Get model predictions.
 
         elif test.related_title in ['MoleculeNet', 'LITPCBA']:
+            # Extract batch data for datasets with a single molecule.
             x_test, y_test = test_batch.to(args.device), test_batch.y.to(args.device)
-            y_pred = model(x_test)
+            y_pred = model(x_test)  # Get model predictions.
 
-        loss = criterion(y_pred, y_test)
+        loss = criterion(y_pred, y_test)  # Compute the loss.
 
         accuracy = []
         for k in range(y_pred.shape[1]):
             try:
+                # Compute the ROC AUC score for each class.
                 accuracy.append(
                     roc_auc_score(y_test[:, k].cpu().detach().numpy(), y_pred[:, k].cpu().detach().numpy()))
 
-                test_loss.append(loss.item())
-                test_acc.append(np.mean(accuracy))
+                test_loss.append(loss.item())  # Append the loss value.
+                test_acc.append(np.mean(accuracy))  # Append the mean accuracy.
 
             except Exception as e:
-                # print(e)
+                # Handle exceptions (e.g., when ROC AUC score cannot be computed).
                 continue
 
-            # _, test_pred = torch.max(output, 1)
-            # correct = (test_pred == y_test).sum()
-            # test_acc += correct.item()
-
-    print()
+    print() ####
     return np.mean(test_acc), np.mean(test_loss)
 
 
 @torch.no_grad()
 def inference_test_regression(args, model, test):
-    model.eval().to(args.device)
-    test_dataset = DataLoader(test, batch_size=args.batch_size, shuffle=True)
+    """
+    Evaluate the performance of a model on a test dataset for a regression task.
 
-    criterion = nn.MSELoss()
+    Args:
+        args (object): Configuration arguments.
+        model (torch.nn.Module): The trained model.
+        test (torch.utils.data.Dataset): The test dataset.
 
-    test_loss = []
-    test_rmse = []
+    Returns:
+        tuple: A tuple containing the mean test RMSE and mean test loss.
+    """
+    model.eval().to(args.device)  # Set the model to evaluation mode and move it to the specified device.
+    test_dataset = DataLoader(test, batch_size=args.batch_size, shuffle=True)  # Create a DataLoader for the test dataset.
+
+    criterion = nn.MSELoss()  # Define the loss criterion for regression.
+
+    test_loss = []  # List to store the test losses.
+    test_rmse = []  # List to store the test RMSE values.
 
     print(' ')
     for i, test_batch in enumerate(test_dataset):
         try:
             if test.related_title in ['DrugBank', 'BIOSNAP', 'CoCrystal']:
+                # Extract batch data for datasets with two molecules.
                 mol1_test, mol2_test = extract_batch_data(test_dataset.dataset.mol_dataset, test_batch)
                 mol1_test, mol2_test, y_test = mol1_test.to(args.device), mol2_test.to(
                     args.device), test_batch.y.to(args.device)
-                y_pred = model(mol1_test, mol2_test)
+                y_pred = model(mol1_test, mol2_test)  # Get model predictions.
 
             elif test.related_title in ['MoleculeNet', 'LITPCBA']:
+                # Extract batch data for datasets with a single molecule.
                 x_test, y_test = test_batch.to(args.device), test_batch.y.to(args.device)
-                y_pred = model(x_test)
+                y_pred = model(x_test)  # Get model predictions.
 
-            loss = criterion(y_pred, y_test)
-            rmse = np.sqrt(mean_squared_error(y_test.cpu().detach().numpy(), y_pred.cpu().detach().numpy()))
+            loss = criterion(y_pred, y_test)  # Compute the loss.
+            rmse = np.sqrt(mean_squared_error(y_test.cpu().detach().numpy(), y_pred.cpu().detach().numpy()))  # Compute the RMSE.
 
-            test_loss.append(loss.item())
-            test_rmse.append(rmse)
+            test_loss.append(loss.item())  # Append the loss value.
+            test_rmse.append(rmse)  # Append the RMSE value.
 
         except Exception as e:
-            # test_loss.append(0)
-            # test_rmse.append(0)
+            # Handle exceptions.
             continue
 
     print()
     return np.mean(test_rmse), np.mean(test_loss)
+
 
 def uniform_samples_collection(max_value = 2.82157,
                                min_value = -0.4242,
