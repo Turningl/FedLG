@@ -37,6 +37,7 @@ Download data to the `FedLG/dataset` folder.
 #### CoCrystal: https://github.com/Saoge123/ccgnet/tree/main/data.
 
 ## Preprocess
+![Extended Data Fig.1.png](assert%2FExtended%20Data%20Fig.1.png)
 
 If run the `main.py` directly, it may take a long time to preprocess dataset, so first run:
 ```shell script
@@ -66,6 +67,8 @@ optional arguments:
 ```
 
 ## Usage
+![Fig.1.png](assert%2FFig.1.png)
+
 ```shell script
 CUDA_VISIBLE_DEVICES=${your_gpu_id} python main.py --save_dir 'results' --alg fedlg --model MPNN --split smi --global_round 100 --local_round 5  --root MoleculeNet --dataset tox21  -- split smi --seed 4567 
 ```
