@@ -11,6 +11,18 @@ np.random.seed(42)
 
 
 def save_progress(args, performance_accountant, optimal_accountant):
+    """
+    Save the progress of a federated learning experiment to a CSV file.
+
+    Args:
+        args (object): Configuration arguments.
+        performance_accountant (list): List of performance metrics.
+        optimal_accountant (float): Optimal result (e.g., best validation accuracy or loss).
+
+    Returns:
+        None
+    """
+    # Determine the save directory based on whether communication optimization is used.
     if args.comm_optimization:
         save_dir = os.path.join(os.getcwd(), args.save_dir,
                                 (args.root if args.root else 'root'),
@@ -21,23 +33,24 @@ def save_progress(args, performance_accountant, optimal_accountant):
                                 (args.root if args.root else 'root'),
                                 (args.dataset if args.dataset else 'dataset'))
 
+    # Create the save directory if it does not exist.
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
 
+    # Construct the file name based on the experiment configuration.
     file_name = '{}_{}_{}_{}_{}_{}'.format(('federated algorithm-' + args.alg if args.alg else 'alg'),
-                                              ('graph model-' + args.model if args.model else 'model'),
-                                              ('num clients-' + str(
-                                                  args.num_clients) if args.num_clients else 'num_clients'),
-                                              ('seed-' + str(args.seed) if args.seed else 'split_seed'),
-                                              ('global round-' + str(
-                                                  args.global_round) if args.global_round else 'global_round'),
-                                              ('local round-' + str(
-                                                  args.local_round) if args.local_round else 'local_round'))
+                                           ('graph model-' + args.model if args.model else 'model'),
+                                           ('num clients-' + str(args.num_clients) if args.num_clients else 'num_clients'),
+                                           ('seed-' + str(args.seed) if args.seed else 'split_seed'),
+                                           ('global round-' + str(args.global_round) if args.global_round else 'global_round'),
+                                           ('local round-' + str(args.local_round) if args.local_round else 'local_round'))
 
+
+    # Write the performance metrics and optimal result to a CSV file.
     with open(os.path.join(save_dir, file_name + '.csv'), 'w') as file:
         writer = csv.writer(file, delimiter=',')
-        writer.writerow(performance_accountant)
-        writer.writerow(['optimal result is:' + str(optimal_accountant)])
+        writer.writerow(performance_accountant)  # Write the performance metrics.
+        writer.writerow(['optimal result is:' + str(optimal_accountant)])  # Write the optimal result.
 
 
 def print_rmse_accoutant(test_results):
