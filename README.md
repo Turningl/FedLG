@@ -37,7 +37,7 @@ Download data to the `FedLG/dataset` folder.
 #### CoCrystal: https://github.com/Saoge123/ccgnet/tree/main/data.
 
 ## Preprocess
-![Extended Data Fig.1.png](assert%2FExtended%20Data%20Fig.1.png)
+![Extended Data Fig. 1.png](assert%2FExtended%20Data%20Fig.1.png)
 
 If run the `main.py` directly, it may take a long time to preprocess dataset, so first run:
 ```shell script
