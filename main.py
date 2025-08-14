@@ -3,22 +3,21 @@
 # @File : main.py
 
 
-import os
 import copy
-import torch
 import argparse
 import numpy as np
 import pandas as pd
 from fedlg.server import GlobalServer
 from fedlg.client import SimulatedDatabase
-from utils.set_epsilons import prepare_local_differential_privacy
 from fedlg.gnn import Mol_architecture, DMol_architecture
-from utils.dataset import MoleculeNetDataset, DrugBankDataset, LITPCBADataset, BIOSNAPDataset, CoCrystalDataset
-from utils.distribution import molecule_dirichlet_distribution, random_distribution
-from utils.nnutils import inference_test_classification, inference_test_regression
-from utils.saveutils import save_progress, print_rmse_accoutant, print_accuracy_accoutant
-import warnings
+from fedlg.database.set_epsilons import prepare_local_differential_privacy
+from fedlg.database.distribution import molecule_dirichlet_distribution
+from fedlg.utils.nnutils import inference_test_classification, inference_test_regression
+from fedlg.utils.saveutils import save_progress, print_rmse_accoutant, print_accuracy_accoutant
+from fedlg.utils.dataset import MoleculeNetDataset, DrugBankDataset, LITPCBADataset, BIOSNAPDataset, CoCrystalDataset
 
+
+import warnings
 warnings.filterwarnings('ignore')
 
 
@@ -34,7 +33,9 @@ def main(args, dataset, model):
     print('privacy preferences: \n', privacy_preferences, '\n')
 
     # set simulated databases
+    max_epsilon, public_indices = 0, None
     simulated_databases = []
+
     for i in range(args.num_clients):
         simulated_database = SimulatedDatabase(train=train, indices=local_indices[i], args=args)
 
@@ -44,31 +45,39 @@ def main(args, dataset, model):
             simulated_database.set_local_differential_privacy(epsilon)
             print('the %d simulated database noise epsilon is %.4f' % ((i + 1), epsilon))
 
+            if epsilon > max_epsilon:
+                public_indices = simulated_database.indices
+                max_epsilon = epsilon
+
         simulated_databases.append(simulated_database)
 
-    # set server
+    # set public indices for simulated database
+    for simulated_database in simulated_databases:
+        simulated_database.set_public_dataset_indices(public_indices)
+
+    # set center
     server = GlobalServer(model=model, args=args)
 
     # set open access database 
     server.set_open_access_database(privacy_preferences) if args.dp else None
 
-    # init server algorithm 
+    # init center algorithm
     server.init_alg(alg=args.alg)
 
     # init global model
     server_model = server.init_global_model()
 
     # set communication round 
-    communication_round = args.global_round // args.local_round
-    print('the communication_round is %d' % communication_round)
+    commun_round = args.global_round // args.local_round
+    print('the communication round is %d' % commun_round)
 
     accuracy_accountant, rmse_accoutant = [], []
     model_states, means = None, None
 
     # =============================== start communication ===============================
-    for r in range(communication_round):
+    for current_round in range(commun_round):
         print()
-        print('the %d communication round. \n' % (r + 1))
+        print('the %d communication round. \n' % (current_round + 1))
 
         # local update and aggregate 
         for idx, participant in enumerate(simulated_databases):
@@ -85,7 +94,7 @@ def main(args, dataset, model):
             model_state = participant.local_update()
 
             # aggregate 
-            server.aggregate(idx, model_state, args.alg)
+            server.aggregate(idx, commun_round-current_round - 1, model_state, args.alg)
 
         # load average weight
         global_model = server.update()
@@ -126,14 +135,16 @@ def main(args, dataset, model):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Federated Lanczos Graph')
+    parser = argparse.ArgumentParser(description='federated learning Lanczos graph')
+
     parser.add_argument('--alg', type=str,
-                        choices=['AdaFedSemi, FedAvg, FedDF, FedProx, FedSGD, FedLG, FedAdam, FLIT, SelectiveFD'],
+                        choices=['AdaFedSemi, FedAvg, FedDF, FedProx, FedSGD, FedLG'
+                                 'FedKT, FedAdam, FLIT, SelectiveFD, Sageflow, Zeno++'],
                         help='algorithm options, start with the choosed algorithm.')
     parser.add_argument('--root', type=str,
                         choices=['MoleculeNet, DrugBank, BIOSNAP, LITPCBA, CoCrystal'],
                         help='choose the dataset, start with the path to dataset dir.')
-    parser.add_argument('--dataset', type=str, 
+    parser.add_argument('--dataset', type=str,
                         choices=['MoleculeNet: bbbp', 'MoleculeNet: bace', 'MoleculeNet: sider', 'MoleculeNet: tox21',
                                  'MoleculeNet: toxcast','MoleculeNet: esol', 'MoleculeNet: lipo', 'MoleculeNet: freesolv',
                                  'LIT-PCBA: ALDH1', 'LIT-PCBA: FEN1', 'LIT-PCBA: GBA', 'LIT-PCBA: KAT2A',
@@ -150,13 +161,13 @@ if __name__ == '__main__':
     parser.add_argument('--extend_dim', default=4, type=float)
     parser.add_argument('--output_size', default=1, type=int,
                         help='initial output size.')
-    parser.add_argument('--model', type=str, choices=['MPNN, GCN, GAT'], 
+    parser.add_argument('--model', type=str, choices=['MPNN, GCN, GAT'],
                         help='Graph model algorithm of MPNN, GCN and GAT.')
-    parser.add_argument('--split', type=str, choices=['smi, smi1, smi2, random'], default='smi',
+
+    parser.add_argument('--split', type=str, choices=['smi, smi1, smi2, random'],
                         help='Choose a data splitting method.')
     parser.add_argument('--dropout', default=0.1, type=float)
     parser.add_argument('--message_steps', default=3, type=int)
-
     parser.add_argument('--num_clients', default=4, type=int)
     parser.add_argument('--alpha', default=0.1, type=float)
     parser.add_argument('--null_value', default=-1, type=float)
@@ -176,17 +187,18 @@ if __name__ == '__main__':
 
     parser.add_argument('--batch_size', default=32, type=int,
                         choices=[32, 64, 128])
-    parser.add_argument('--device', default='cuda', type=str,
+    parser.add_argument('--device', default='cuda:0', type=str,
                         choices=['cuda', 'cpu'])
     parser.add_argument('--save_dir', default='results', type=str)
 
     parser.add_argument('--beta1', default=0.9, type=float)
     parser.add_argument('--beta2', default=0.999, type=float)
-
+    parser.add_argument('--staleness_exponent', default=0.5, type=float)
+    parser.add_argument('--entropy_threshold', default=1.0, type=float)
     parser.add_argument('--local_round', default=10, type=int)
     parser.add_argument('--global_round', default=200, type=int)
-
     parser.add_argument('--proj_dims', default=1, type=int)
+
     parser.add_argument('--lanczos_iter', default=8, type=int)
     parser.add_argument('--lr', default=0.001, type=float,
                         choices=[0.1, 0.001, 0.0001])
@@ -198,9 +210,20 @@ if __name__ == '__main__':
     parser.add_argument('--max_confidence', default=0.99, type=float)
     parser.add_argument('--min_confidence', default=0.8, type=float)
 
+    parser.add_argument('--loss_exponent', default=0.5, type=float)
+    parser.add_argument('--rho', default=1e-6, type=float, choices=[1e-5, 1e-6])
+    parser.add_argument('--scorep', default=1.0, type=float)
+    parser.add_argument('--use_public', default=False, type=bool)
+
+    parser.add_argument('--min_entropy', default=1e-5, type=float)
+    parser.add_argument('--max_entropy', default=100, type=float)
+
+    parser.add_argument('--n_teacher_each_partition', default=3, type=int)
+    parser.add_argument('--gamma', default=1.0, type=float)
+
     parser.add_argument('--init', default=10, type=int, help='the count of initial random points')
     parser.add_argument('--max_step', default=100, type=int, help='the maximum steps for Bayesian optimization')
-    
+
     args = parser.parse_args()
     # os.environ["CUDA_VISIBLE_DEVICES"] = '0'
 
