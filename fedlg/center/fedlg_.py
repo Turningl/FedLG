@@ -188,8 +188,7 @@ class FedLG:
                         torch.mul(proj_eigenvecs, torch.dot(proj_eigenvecs.T, (mean_priv_model_state[i] - mean))) + mean
                 )
 
-                # Compute the final mean model state by combining the projected private institutional model state
-                # and the open-access model state, weighted by their respective epsilons
+                # Compute the final mean model state by combining the projected private institutional model state and the open-access model state, weighted by their respective epsilons
                 mean_model_state[i] = (
                         (mean_proj_priv_model_state[i] * sum(self.__private_institutional_eps) +
                          mean_pub_model_state[i] * sum(self.__open_access_eps)) /
@@ -321,5 +320,6 @@ class FedLG:
 
         self.__open_access_eps = []
         self.__private_institutional_eps = []
+
 
         return mean_updates
