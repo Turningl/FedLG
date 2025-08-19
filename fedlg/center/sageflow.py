@@ -233,16 +233,21 @@ class SageFlow:
                     logits = model(x)
 
                 if self.task_type == "binary":
-                    p = torch.sigmoid(logits).clamp(1e-8, 0.99 - 1e-8)
+                    # p = torch.sigmoid(logits).clamp(1e-8, 0.99 - 1e-8)
+                    
+                    p = torch.sigmoid(logits)
                     entropy = -(p * torch.log(p) + (1 - p) * torch.log(1 - p)).squeeze()
                     entropy = entropy.clamp(min=self.min_entropy, max=self.max_entropy)
 
                 elif self.task_type == "multi":
-                    p = torch.softmax(logits, dim=1).clamp(1e-8, 0.99 - 1e-8)
+                    # p = torch.softmax(logits, dim=1).clamp(1e-8, 0.99 - 1e-8)
+                    
+                    p = torch.softmax(logits, dim=1)
                     entropy = -(p * torch.log(p)).sum(dim=1).clamp(min=self.min_entropy, max=self.max_entropy)
 
                 elif self.task_type == "regression":
-                    entropy = ((logits - y) ** 2).clamp(min=self.min_entropy, max=self.max_entropy)
+                    # entropy = ((logits - y) ** 2).clamp(min=self.min_entropy, max=self.max_entropy)
+                    entropy = ((logits - y) ** 2)
 
                 entropy_sum += entropy.sum().item()
                 total += logits.size(0)
@@ -269,3 +274,4 @@ class SageFlow:
                 total += logits.size(0)
 
         return loss_sum / total
+
