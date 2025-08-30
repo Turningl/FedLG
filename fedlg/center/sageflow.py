@@ -39,7 +39,6 @@ class SageFlow:
         dataset (torch.utils.data.Dataset): The dataset used for training.
         indices (list): Indices of selected samples from the public dataset.
         task_type (str): Type of the task (e.g., 'classification', 'regression').
-        dataset_type (str): Type of the dataset
     """
 
     def __init__(
@@ -274,5 +273,6 @@ class SageFlow:
                 total += logits.size(0)
 
         return loss_sum / total
+
 
 
