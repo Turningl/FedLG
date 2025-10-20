@@ -41,7 +41,7 @@ Download data to the `FedLG/dataset` folder.
 
 If run the `main.py` directly, it may take a long time to preprocess dataset, so first run:
 ```shell script
-python dataloaer.py --root MoleculeNet --dataset tox21 -- split smi --seed 4567
+python dataloader.py --root MoleculeNet --dataset tox21 -- split smi --seed 4567
 ```
 All parameters of dataloader:
 ```
