@@ -165,9 +165,14 @@ FedLG is released under the [MIT](LICENSE) license.
 - FedChem: https://github.com/ur-whitelab/fedchem
 - Chemprop: https://github.com/chemprop/chemprop
 - PFA: https://github.com/Emory-AIMS/PFA
+- CCGNet: https://github.com/Saoge123/ccgnet
 - GLAM: https://github.com/yvquanli/GLAM
 - FedPerGNN: https://github.com/wuch15/FedPerGNN
-- Triplet Graph Transformers: https://github.com/shamim-hussain/tgt
+- MPNN: https://github.com/brain-research/mpnn
+- Graph Neural Networks for Quantum Chemistry: https://github.com/ifding/graph-neural-networks
+- SpreadGNN: https://github.com/FedML-AI/SpreadGNN
+- Federated-Learning (PyTorch): https://github.com/AshwinRJ/Federated-Learning-PyTorch
+- Opacus: https://github.com/meta-pytorch/opacus
 
 ## Contact
 
