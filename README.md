@@ -164,10 +164,10 @@ FedLG is released under the [MIT](LICENSE) license.
 - Lanczos Network: https://github.com/lrjconan/LanczosNetwork
 - FedChem: https://github.com/ur-whitelab/fedchem
 - Chemprop: https://github.com/chemprop/chemprop
-- PFA: https://github.com/Emory-AIMS/PFA
 - CCGNet: https://github.com/Saoge123/ccgnet
 - GLAM: https://github.com/yvquanli/GLAM
 - FedPerGNN: https://github.com/wuch15/FedPerGNN
+- PFA: https://github.com/Emory-AIMS/PFA
 - MPNN: https://github.com/brain-research/mpnn
 - Graph Neural Networks for Quantum Chemistry: https://github.com/ifding/graph-neural-networks
 - SpreadGNN: https://github.com/FedML-AI/SpreadGNN
