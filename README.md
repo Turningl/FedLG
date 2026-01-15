@@ -163,6 +163,7 @@ FedLG is released under the [MIT](LICENSE) license.
 
 - Lanczos Network: https://github.com/lrjconan/LanczosNetwork
 - FedChem: https://github.com/ur-whitelab/fedchem
+- Chemprop: https://github.com/chemprop/chemprop
 - PFA: https://github.com/Emory-AIMS/PFA
 - GLAM: https://github.com/yvquanli/GLAM
 - FedPerGNN: https://github.com/wuch15/FedPerGNN
