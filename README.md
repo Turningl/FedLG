@@ -159,6 +159,15 @@ optional arguments:
 
 FedLG is released under the [MIT](LICENSE) license.
 
+## Acknowledgement
+
+- Lanczos Network: https://github.com/lrjconan/LanczosNetwork
+- FedChem: https://github.com/ur-whitelab/fedchem
+- PFA: https://github.com/Emory-AIMS/PFA
+- GLAM: https://github.com/yvquanli/GLAM
+- FedPerGNN: https://github.com/wuch15/FedPerGNN
+- Triplet Graph Transformers: https://github.com/shamim-hussain/tgt
+
 ## Contact
 
 If you have any questions, please reach out to liang36365@mail.ustc.edu.cn
